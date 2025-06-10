@@ -8,29 +8,31 @@
       indeterminate
     />
 
-    <!-- Сообщение, если лиг нет -->
-    <v-alert v-else-if="filteredLeagues.length === 0" class="ma-4" type="info">
-      {{ searchQuery ? "Ничего не найдено" : "Нет доступных лиг" }}
+    <!-- Сообщение, если команд нет -->
+    <v-alert v-else-if="filteredTeams.length === 0" class="ma-4" type="info">
+      {{ searchQuery ? "Ничего не найдено" : "Нет доступных команд" }}
     </v-alert>
 
-    <!-- Карточки лиг + пагинация -->
+    <!-- Карточки команд + пагинация -->
     <template v-else>
       <div class="content">
         <v-row>
           <v-col
-            v-for="league in paginatedLeagues"
-            :key="league.id"
+            v-for="team in paginatedTeams"
+            :key="team.id"
             cols="12"
+            lg="2.4"
             md="4"
             sm="6"
+            class="team-col"
           >
-            <v-card class="ma-2 league-card" @click="goToLeague(league.id)">
+            <v-card class="ma-2 team-card" @click="goToTeam(team.id)">
               <v-img
-                v-if="league.emblem"
+                v-if="team.crest"
                 class="grey lighten-2"
                 contain
                 height="100"
-                :src="league.emblem"
+                :src="team.crest"
               />
               <v-img
                 v-else
@@ -39,10 +41,10 @@
                 height="100"
                 src="/src/assets/placeholder.svg"
               />
-              <div class="league-info">
-                <div class="league-name">{{ league.name }}</div>
-                <div class="league-country">
-                  {{ league.area?.name || "Не указано" }}
+              <div class="team-info">
+                <div class="team-name">{{ team.name }}</div>
+                <div class="team-area">
+                  {{ team.area?.name || "Не указано" }}
                 </div>
               </div>
             </v-card>
@@ -66,46 +68,51 @@ export default {
   components: {
     Pagination,
   },
+  props: {
+    searchQuery: {
+      type: String,
+      default: "",
+    },
+  },
   data() {
     return {
       page: 1,
-      itemsPerPage: 9, // 3 columns * 3 rows
-      leagues: [],
+      itemsPerPage: 10, // 5 columns * 2 rows
+      teams: [],
       isLoading: false,
-      searchQuery: "",
     };
   },
   computed: {
     totalPages() {
-      return Math.ceil(this.filteredLeagues.length / this.itemsPerPage);
+      return Math.ceil(this.filteredTeams.length / this.itemsPerPage);
     },
-    paginatedLeagues() {
+    paginatedTeams() {
       const start = (this.page - 1) * this.itemsPerPage;
       const end = start + this.itemsPerPage;
-      return this.filteredLeagues.slice(start, end);
+      return this.filteredTeams.slice(start, end);
     },
-    filteredLeagues() {
-      if (!this.searchQuery) return this.leagues;
+    filteredTeams() {
+      if (!this.searchQuery) return this.teams;
       const query = this.searchQuery.toLowerCase();
-      return this.leagues.filter((league) =>
-        league.name.toLowerCase().includes(query)
+      return this.teams.filter((team) =>
+        team.name.toLowerCase().includes(query)
       );
     },
   },
   mounted() {
-    this.loadLeagues();
+    this.loadTeams();
   },
   methods: {
-    loadLeagues() {
+    loadTeams() {
       this.isLoading = true;
       api
-        .get("api/v4/competitions")
-        .then((response) => (this.leagues = response.data.competitions))
+        .get("api/v4/teams")
+        .then((response) => (this.teams = response.data.teams))
         .catch((error) => console.error(error))
         .finally(() => (this.isLoading = false));
     },
-    goToLeague(leagueId) {
-      this.$router.push(`/league/?id=${leagueId}`);
+    goToTeam(teamId) {
+      this.$router.push(`/team/?id=${teamId}`);
     },
   },
 };
@@ -127,7 +134,12 @@ export default {
   padding: 20px 0;
 }
 
-.league-card {
+.team-col {
+  flex: 0 0 20%; /* Exactly 5 columns */
+  max-width: 20%;
+}
+
+.team-card {
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -137,12 +149,12 @@ export default {
   cursor: pointer;
 }
 
-.league-card:hover {
+.team-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.league-info {
+.team-info {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -151,14 +163,35 @@ export default {
   text-align: center;
 }
 
-.league-name {
+.team-name {
   font-size: 16px;
   font-weight: bold;
   margin-bottom: 4px;
 }
 
-.league-country {
+.team-area {
   font-size: 16px;
   color: rgba(0, 0, 0, 0.6);
+}
+
+@media (max-width: 1264px) {
+  .team-col {
+    flex: 0 0 33.333%;
+    max-width: 33.333%;
+  }
+}
+
+@media (max-width: 960px) {
+  .team-col {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+}
+
+@media (max-width: 600px) {
+  .team-col {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
 }
 </style>
