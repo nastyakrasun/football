@@ -196,8 +196,8 @@ export default {
         // Calculate basic statistics
         this.stats = this.calculateStats()
       } catch (err) {
-        this.error = 'Failed to load team data. Please try again later.'
-        console.error('Error fetching team data:', err)
+        this.error = 'Не удалось загрузить данные по команде. Пожалуйста, попробуйте позже.'
+        console.error('Ошибка загрузки данных команды:', err)
       } finally {
         this.isLoading = false
       }

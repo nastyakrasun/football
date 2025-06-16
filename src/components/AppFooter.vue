@@ -22,14 +22,20 @@
           <h3>Контакты</h3>
           <p>Email: info@footballstats.com</p>
           <div class="social-links">
-            <v-btn icon><v-icon>mdi-facebook</v-icon></v-btn>
-            <v-btn icon><v-icon>mdi-twitter</v-icon></v-btn>
-            <v-btn icon><v-icon>mdi-instagram</v-icon></v-btn>
+            <v-btn icon href="https://vk.com" target="_blank" rel="noopener noreferrer">
+              <v-icon>mdi-vk</v-icon>
+            </v-btn>
+            <v-btn icon href="https://t.me" target="_blank" rel="noopener noreferrer">
+              <v-icon>mdi-telegram</v-icon>
+            </v-btn>
+            <v-btn icon href="https://wa.me" target="_blank" rel="noopener noreferrer">
+              <v-icon>mdi-whatsapp</v-icon>
+            </v-btn>            
           </div>
         </div>
       </div>
 
-      <!-- Copyright -->
+      <!-- Авторское право -->
       <div class="footer-bottom">
         <p>&copy; {{ new Date().getFullYear() }} Football Stats. Все права защищены.</p>
       </div>
@@ -46,15 +52,15 @@ export default {
 <style scoped>
 .app-footer {
   background-color: #f5f5f5;
-  padding: 3rem 0 1rem;
-  margin-top: 4rem;
+  padding: 1rem 0 1rem;
+  margin-top: 0.5rem;
 }
 
 .footer-content {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
-  margin-bottom: 2rem;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .footer-section h3 {
@@ -96,7 +102,7 @@ export default {
 
 .footer-bottom {
   text-align: center;
-  padding-top: 2rem;
+  padding-top: 1.5rem;
   border-top: 1px solid #ddd;
   color: #666;
 }

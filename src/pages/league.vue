@@ -230,8 +230,8 @@ export default {
         const teamsResponse = await api.get(`api/v4/competitions/${leagueId}/teams`)
         this.teams = teamsResponse.data.teams
       } catch (err) {
-        this.error = 'Failed to load league data. Please try again later.'
-        console.error('Error fetching league data:', err)
+        this.error = 'Не удалось загрузить данные по лиге. Пожалуйста, попробуйте позже.'
+        console.error('Ошибка загрузки данных лиги:', err)
       } finally {
         this.isLoading = false
       }

@@ -148,7 +148,7 @@ export default {
         this.error = err.message === 'Неверный формат данных' 
           ? 'Ошибка в формате данных. Пожалуйста, попробуйте позже.'
           : 'Не удалось загрузить лиги. Пожалуйста, попробуйте позже.'
-        console.error('Error fetching leagues:', err)
+        console.error('Ошибка загрузки лиг:', err)
       } finally {
         this.isLoading = false
       }
@@ -176,12 +176,12 @@ export default {
 .leagues-page {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 1rem 1rem;
 }
 
 .page-header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
 }
 
 .page-header h1 {

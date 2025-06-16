@@ -2,8 +2,8 @@
   <div class="teams-page">
     <!-- Page Title -->
     <div class="page-header">
-      <h1>Football Teams</h1>
-      <p class="subtitle">Explore all available football teams and their statistics</p>
+      <h1>Футбольные команды</h1>
+      <p class="subtitle">и их статистика</p>
     </div>
 
     <!-- Loading State -->
@@ -27,15 +27,15 @@
     <!-- Teams Grid -->
     <div v-else class="teams-grid">
       <v-card
-        v-for="team in filteredTeams"
+        v-for="team in paginatedTeams"
         :key="team.id"
         class="team-card"
         @click="goToTeam(team.id)"
       >
         <v-img
           :src="team.crest || '/src/assets/placeholder.svg'"
-          height="200"
-          cover
+          height="150"
+          center
           class="team-crest"
         >
           <template v-slot:placeholder>
@@ -55,29 +55,6 @@
         <v-card-title class="team-name">
           {{ team.name }}
         </v-card-title>
-
-        <v-card-text>
-          <div class="team-info">
-            <div class="info-item">
-              <v-icon>mdi-map-marker</v-icon>
-              <span>{{ team.area?.name || 'Not specified' }}</span>
-            </div>
-            <div class="info-item">
-              <v-icon>mdi-trophy</v-icon>
-              <span>{{ team.tla || 'N/A' }}</span>
-            </div>
-          </div>
-        </v-card-text>
-
-        <v-card-actions>
-          <v-btn
-            color="primary"
-            variant="text"
-            @click.stop="goToTeam(team.id)"
-          >
-            View Details
-          </v-btn>
-        </v-card-actions>
       </v-card>
     </div>
 
@@ -89,14 +66,26 @@
     >
       No teams found matching your search criteria.
     </v-alert>
+
+    <!-- Пагинация -->
+    <Pagination
+        v-if="filteredTeams.length > 0"
+        :total-pages="totalPages"
+        :current-page="page"
+        @update:currentPage="handlePageChange"
+      />
   </div>
 </template>
 
 <script>
 import api from '@/api'
+import Pagination from '@/components/Pagination.vue'
 
 export default {
   name: 'TeamsPage',
+  components: {
+    Pagination
+  },
   props: {
     searchQuery: {
       type: String,
@@ -107,7 +96,9 @@ export default {
     return {
       teams: [],
       isLoading: true,
-      error: null
+      error: null,
+      page: 1,
+      itemsPerPage: 10 // 5 columns * 2 rows
     }
   },
   computed: {
@@ -120,6 +111,14 @@ export default {
         team.area?.name.toLowerCase().includes(query) ||
         team.tla?.toLowerCase().includes(query)
       )
+    },
+    totalPages() {
+      return Math.ceil(this.filteredTeams.length / this.itemsPerPage)
+    },
+    paginatedTeams() {
+      const start = (this.page - 1) * this.itemsPerPage
+      const end = start + this.itemsPerPage
+      return this.filteredTeams.slice(start, end)
     }
   },
   methods: {
@@ -129,16 +128,32 @@ export default {
       
       try {
         const response = await api.get('api/v4/teams')
-        this.teams = response.data.teams
+        if (response.data && Array.isArray(response.data.teams)) {
+          this.teams = response.data.teams
+          this.page = 1 // Reset to first page when new data is loaded
+        } else {
+          throw new Error('Неверный формат данных')
+        }
       } catch (err) {
-        this.error = 'Failed to load teams. Please try again later.'
-        console.error('Error fetching teams:', err)
+        this.error = err.message === 'Неверный формат данных' 
+          ? 'Ошибка в формате данных. Пожалуйста, попробуйте позже.'
+          : 'Не удалось загрузить команды. Пожалуйста, попробуйте позже.'
+        console.error('Ошибка загрузки команд:', err)
       } finally {
         this.isLoading = false
       }
     },
     goToTeam(teamId) {
       this.$router.push(`/team/${teamId}`)
+    },
+    handlePageChange(newPage) {
+      this.page = newPage
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  },
+  watch: {
+    searchQuery() {
+      this.page = 1 // Reset to first page when search query changes
     }
   },
   mounted() {
@@ -151,12 +166,12 @@ export default {
 .teams-page {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 1rem 1rem;
 }
 
 .page-header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
 }
 
 .page-header h1 {
@@ -179,8 +194,8 @@ export default {
 
 .teams-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
   padding: 1rem 0;
 }
 
@@ -205,6 +220,7 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: center;
 }
 
 .team-info {
@@ -225,11 +241,29 @@ export default {
   color: #1976d2;
 }
 
+@media (max-width: 1200px) {
+  .teams-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 960px) {
+  .teams-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   .page-header h1 {
     font-size: 2rem;
   }
 
+  .teams-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
   .teams-grid {
     grid-template-columns: 1fr;
   }

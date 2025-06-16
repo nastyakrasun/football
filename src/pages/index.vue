@@ -79,16 +79,16 @@ export default {
 .home-page {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 1rem 1rem;
 }
 
 .hero {
   text-align: center;
-  padding: 4rem 1rem;
+  padding: 3rem 1rem;
   background: linear-gradient(135deg, #1976d2 0%, #2196f3 100%);
   color: white;
   border-radius: 8px;
-  margin-bottom: 4rem;
+  margin-bottom: 2rem;
 }
 
 .hero-content {
@@ -114,13 +114,13 @@ export default {
 }
 
 .features {
-  margin-bottom: 4rem;
+  margin-bottom: 1.5rem;
 }
 
 .features h2 {
   text-align: center;
   font-size: 2rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   color: #1976d2;
 }
 
@@ -156,13 +156,13 @@ export default {
 }
 
 .quick-access {
-  margin-bottom: 4rem;
+  margin-bottom: 1rem;
 }
 
 .quick-access h2 {
   text-align: center;
   font-size: 2rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   color: #1976d2;
 }
 
