@@ -4,9 +4,9 @@
  * Automatic routes for `./src/pages/*.vue`
  */
 
-// Composables
+// Composables Составляющие
 import { createRouter, createWebHistory } from "vue-router";
-
+// современные фреймворки автоматически прописывают новую страницу в роутере
 const routes = [
   {
     path: "/",
@@ -41,6 +41,7 @@ const router = createRouter({
 });
 
 // Workaround for https://github.com/vitejs/vite/issues/11804
+// если возникают ошибки, они выводятся здесь
 router.onError((err, to) => {
   if (err?.message?.includes?.("Failed to fetch dynamically imported module")) {
     if (!localStorage.getItem("vuetify:dynamic-reload")) {

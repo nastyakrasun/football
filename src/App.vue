@@ -1,3 +1,4 @@
+<!-- корневой файл приложения .vue с корневым шаблоном, говорящим о том, что есть приложение с основной частью и роутером router-view -->
 <template>
   <div class="app-container">
     <AppHeader
@@ -6,6 +7,7 @@
 
     <!-- Основное содержание -->
     <main class="main-content">
+      <!-- router-view - этот роутер говорит о том, из каких элементов состоит наше приложение -->
       <router-view :searchQuery="searchQuery" />
     </main>
 

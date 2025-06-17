@@ -5,7 +5,8 @@
         <!-- Секция о нас -->
         <div class="footer-section">
           <h3>О нас</h3>
-          <p>Предоставляем информацию о футбольных лигах, командах и матчах в режиме реального времени</p>
+          <p>Предоставляем информацию о футбольных матчах в рамках лиги (соревнований) и матчах команд в режиме реального времени
+            </p>
         </div>
 
         <!-- Секция перехода -->
@@ -20,7 +21,7 @@
         <!-- Секция обратной связи -->
         <div class="footer-section">
           <h3>Контакты</h3>
-          <p>Email: info@footballstats.com</p>
+          <p>Email: info@soccerstat.com</p>
           <div class="social-links">
             <v-btn icon href="https://vk.com" target="_blank" rel="noopener noreferrer">
               <v-icon>mdi-vk</v-icon>
@@ -37,7 +38,7 @@
 
       <!-- Авторское право -->
       <div class="footer-bottom">
-        <p>&copy; {{ new Date().getFullYear() }} Football Stats. Все права защищены.</p>
+        <p>&copy; {{ new Date().getFullYear() }} SoccerStat. Все права защищены.</p>
       </div>
     </v-container>
   </footer>
@@ -51,27 +52,31 @@ export default {
 
 <style scoped>
 .app-footer {
-  background-color: #f5f5f5;
-  padding: 1rem 0 1rem;
-  margin-top: 0.5rem;
+  background-color: #2c3e50;
+  color: white;
+  padding: 3rem 0 1.5rem;
+  margin-top: 2rem;
 }
 
 .footer-content {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
 }
 
 .footer-section h3 {
-  color: #1976d2;
-  margin-bottom: 1rem;
-  font-size: 1.2rem;
+  color: #3498db;
+  margin-bottom: 1.25rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 .footer-section p {
-  color: #666;
-  line-height: 1.6;
+  color: #ecf0f1;
+  line-height: 1.7;
+  opacity: 0.9;
 }
 
 .footer-links {
@@ -81,40 +86,74 @@ export default {
 }
 
 .footer-links li {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .footer-links a {
-  color: #666;
+  color: #ecf0f1;
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
+  opacity: 0.9;
+  font-size: 1.05rem;
+  display: inline-block;
 }
 
 .footer-links a:hover {
-  color: #1976d2;
+  color: #3498db;
+  opacity: 1;
+  transform: translateX(5px);
 }
 
 .social-links {
   display: flex;
   gap: 1rem;
-  margin-top: 1rem;
+  margin-top: 1.25rem;
+}
+
+.social-links .v-btn {
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.social-links .v-btn:hover {
+  background-color: #3498db;
+  transform: translateY(-3px);
+}
+
+.social-links .v-icon {
+  color: white;
 }
 
 .footer-bottom {
   text-align: center;
   padding-top: 1.5rem;
-  border-top: 1px solid #ddd;
-  color: #666;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ecf0f1;
+  opacity: 0.8;
+  font-size: 0.95rem;
 }
 
 @media (max-width: 768px) {
+  .app-footer {
+    padding: 2rem 1rem 1rem;
+  }
+
   .footer-content {
     grid-template-columns: 1fr;
     text-align: center;
+    gap: 2rem;
+  }
+
+  .footer-links a:hover {
+    transform: none;
   }
 
   .social-links {
     justify-content: center;
+  }
+
+  .footer-section {
+    padding: 0 1rem;
   }
 }
 </style>

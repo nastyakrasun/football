@@ -10,6 +10,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AppFooter: typeof import('./src/components/AppFooter.vue')['default']
     AppHeader: typeof import('./src/components/AppHeader.vue')['default']
+    DateFilter: typeof import('./src/components/DateFilter.vue')['default']
     Leagues: typeof import('./src/components/Leagues.vue')['default']
     Matches: typeof import('./src/components/Matches.vue')['default']
     Pagination: typeof import('./src/components/Pagination.vue')['default']

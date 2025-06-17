@@ -7,7 +7,7 @@
     "moduleResolution": "bundler",
     "paths": {
       "@/*": [
-        "src/*"
+        "src/*" // все исходники находятся в папке src
       ]
     },
     "lib": [

@@ -43,7 +43,7 @@
           @click="goToLeague(league.id)"
         >
           <v-img
-            :src="league.emblem || '/src/assets/placeholder.svg'"
+            :src="league.emblem || '/src/assets/free-icon-football-club-919408.png'"
             height="100"
             center
             class="league-emblem"
@@ -69,7 +69,13 @@
           <v-card-text>
             <div class="league-info">
               <div class="info-item">
-                <v-icon>mdi-map-marker</v-icon>
+                <!-- <v-icon>mdi-map-marker</v-icon> -->
+                <v-img
+                  :src="'/src/assets/free-icon-pin-919412.png'"
+                  width="24"
+                  height="24"
+                  class="info-icon"
+                />
                 <span>{{ league.area?.name || 'Не указано' }}</span>
               </div>
             </div>
@@ -176,96 +182,138 @@ export default {
 .leagues-page {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem 1rem;
+  padding: 2rem 1.5rem;
+  min-height: calc(100vh - 200px);
 }
 
 .page-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.page-header::after {
+  content: '';
+  position: absolute;
+  bottom: -1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, #3498db, #2c3e50);
+  border-radius: 2px;
 }
 
 .page-header h1 {
-  font-size: 2.5rem;
-  color: #1976d2;
-  margin-bottom: 0.5rem;
+  font-size: 2.8rem;
+  color: #2c3e50;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
 .subtitle {
-  color: #666;
-  font-size: 1.1rem;
+  color: #7f8c8d;
+  font-size: 1.2rem;
+  font-weight: 500;
 }
 
 .loading-state {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 400px;
+  min-height: 300px;
 }
 
 .leagues-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 2rem;
-  padding: 1rem 0;
+  margin-bottom: 2rem;
 }
 
 .league-card {
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(44, 62, 80, 0.1);
+  background: white;
 }
 
 .league-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 25px rgba(44, 62, 80, 0.15);
+  border-color: #3498db;
 }
 
 .league-emblem {
-  background-color: #f5f5f5;
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .league-name {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: 600;
-  padding: 1rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-align: center;
+  color: #2c3e50;
+  padding: 1rem 1rem 0.5rem;
+  line-height: 1.4;
 }
 
 .league-info {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  align-items: flex-end;
-  padding-right: 1rem;
+  margin-right: 12rem;
+  text-align: left;
 }
 
 .info-item {
   display: flex;
-  align-items: center;
+  align-items: left;
   gap: 0.5rem;
-  color: #666;
-  justify-content: flex-end;
+  color: #7f8c8d;
+  font-size: 0.95rem;
 }
 
-.info-item .v-icon {
-  font-size: 1.2rem;
-  color: #1976d2;
-  order: 2;
+.info-icon {
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+  margin-right: 0;
 }
 
-.info-item span {
-  order: 1;
+.info-item:hover .info-icon {
+  opacity: 1;
+}
+
+.v-alert {
+  border-radius: 8px;
+  margin: 1rem 0;
 }
 
 @media (max-width: 768px) {
+  .leagues-page {
+    padding: 1.5rem 1rem;
+  }
+
   .page-header h1 {
     font-size: 2rem;
   }
 
+  .subtitle {
+    font-size: 1.1rem;
+  }
+
   .leagues-grid {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .league-card {
+    margin: 0 0.5rem;
   }
 }
 </style> 

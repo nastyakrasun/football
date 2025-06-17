@@ -67,8 +67,8 @@
               </v-btn>
             </v-col>
           </v-row>
-        </v-card-text>
-      </v-card>
+              </v-card-text>
+            </v-card>
 
       <v-data-table
         :headers="headers"
@@ -179,7 +179,7 @@ export default {
         this.matches = matchesResponse.data.matches
       } catch (err) {
         this.error = 'Не удалось загрузить данные команды. Пожалуйста, попробуйте позже.'
-        console.error('Ошибка загрузки данных команды:', err)
+        console.error('Team data error:', err)
       } finally {
         this.isLoading = false
       }
@@ -234,22 +234,235 @@ export default {
 .team-page {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem 1rem;
+  padding: 2rem 1.5rem;
+  min-height: calc(100vh - 200px);
 }
 
 .page-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.page-header::after {
+  content: '';
+  position: absolute;
+  bottom: -1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, #3498db, #2c3e50);
+  border-radius: 2px;
 }
 
 .page-header h1 {
-  font-size: 2.5rem;
-  color: #1976d2;
-  margin-bottom: 0.5rem;
+  font-size: 2.8rem;
+  color: #2c3e50;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
 .subtitle {
-  color: #666;
-  font-size: 1.1rem;
+  color: #7f8c8d;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.v-card {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
+  border: 1px solid rgba(44, 62, 80, 0.05);
+  margin-bottom: 2rem;
+}
+
+.v-date-picker {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
+  border: 1px solid rgba(44, 62, 80, 0.05);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 6px 20px rgba(44, 62, 80, 0.15);
+  }
+
+  :deep(.v-date-picker-header) {
+    padding: 16px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(44, 62, 80, 0.05);
+  }
+
+  :deep(.v-date-picker-header__title) {
+    font: 600 1.1rem/1.2 sans-serif;
+    color: #2c3e50;
+  }
+
+  :deep(.v-date-picker-table) {
+    padding: 8px;
+
+    &__current {
+      color: #3498db;
+      font-weight: 600;
+    }
+
+    &__day {
+  border-radius: 8px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: rgba(52, 152, 219, 0.1);
+      }
+
+      &--selected {
+        background-color: #3498db !important;
+        color: white !important;
+
+        &:hover {
+          background-color: #2980b9 !important;
+        }
+      }
+
+      &--disabled {
+        color: #bdc3c7 !important;
+      }
+
+      &--adjacent-month {
+        color: #95a5a6;
+      }
+    }
+
+    &__weekday {
+      color: #7f8c8d;
+      font: 500 0.9rem/1 sans-serif;
+    }
+
+    &__month,
+    &__year {
+      color: #2c3e50;
+      font-weight: 500;
+
+      &:hover {
+        background-color: rgba(52, 152, 219, 0.1);
+      }
+
+      &--selected {
+        background-color: #3498db !important;
+        color: white !important;
+      }
+    }
+
+    &__header {
+      padding: 8px;
+      background-color: #f8f9fa;
+
+      &-title {
+        font-weight: 600;
+        color: #2c3e50;
+      }
+
+      &-arrow {
+        color: #3498db;
+
+        &:hover {
+          background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        &--disabled {
+          color: #bdc3c7;
+
+          &:hover {
+            background-color: transparent;
+          }
+        }
+      }
+    }
+  }
+}
+
+.v-text-field {
+  margin-bottom: 1rem;
+}
+
+.v-text-field :deep(.v-field) {
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.v-text-field :deep(.v-field:hover) {
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.1);
+}
+
+.v-text-field :deep(.v-field--focused) {
+  box-shadow: 0 2px 12px rgba(52, 152, 219, 0.15);
+}
+
+.v-btn {
+  text-transform: none;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  transition: all 0.3s ease;
+}
+
+.v-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+}
+
+.v-data-table {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
+  margin-top: 1.5rem;
+}
+
+.v-data-table :deep(th) {
+  background-color: #f8f9fa !important;
+  color: #2c3e50 !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+  text-transform: none !important;
+  letter-spacing: 0.3px !important;
+}
+
+.v-data-table :deep(td) {
+  color: #2c3e50 !important;
+  font-size: 0.95rem !important;
+}
+
+.v-chip {
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.v-alert {
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+@media (max-width: 768px) {
+  .team-page {
+    padding: 1.5rem 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 1.1rem;
+  }
+
+  .v-data-table {
+    margin: 1rem -0.5rem;
+    border-radius: 8px;
+  }
+
+  .v-card {
+    margin: 1rem -0.5rem;
+  }
 }
 </style> 
