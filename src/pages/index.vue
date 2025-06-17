@@ -60,13 +60,13 @@ export default {
         {
           icon: 'mdi-trophy',
           title: 'Лиги',
-          description: 'Ознакомиться со всеми доступными футбольными лигами',
+          description: 'Ознакомиться с футбольными лигами',
           route: '/leagues'
         },
         {
           icon: 'mdi-account-group',
           title: 'Команды',
-          description: 'Просмотреть профили команд и статистику',
+          description: 'Просмотреть матчи и статистику команд',
           route: '/teams'
         }
       ]

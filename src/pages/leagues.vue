@@ -1,12 +1,12 @@
 <template>
   <div class="leagues-page">
-    <!-- Page Title -->
+    <!-- Название страницы -->
     <div class="page-header">
       <h1>Футбольные лиги</h1>
       <p class="subtitle">и их статистика</p>
     </div>
 
-    <!-- Loading State -->
+    <!-- Состояние загрузки -->
     <div v-if="isLoading" class="loading-state">
       <v-progress-circular
         indeterminate
@@ -15,7 +15,7 @@
       ></v-progress-circular>
     </div>
 
-    <!-- Error State -->
+    <!-- Состояние ошибки -->
     <v-alert
       v-else-if="error"
       type="error"
@@ -24,16 +24,16 @@
       {{ error }}
     </v-alert>
 
-    <!-- No Results State -->
+    <!-- Состояние нет результатов -->
     <v-alert
       v-else-if="!isLoading && filteredLeagues.length === 0"
       type="info"
       class="ma-4"
     >
-      {{ searchQuery ? "Ничего не найдено" : "Нет доступных лиг" }}
+      {{ searchQuery ? "No leagues found" : "Нет доступных лиг" }}
     </v-alert>
 
-    <!-- Leagues Grid -->
+    <!-- Сетка лиг -->
     <template v-else>
       <div class="leagues-grid">
         <v-card

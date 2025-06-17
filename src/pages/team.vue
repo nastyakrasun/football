@@ -1,15 +1,20 @@
 <template>
   <div class="team-page">
-    <!-- Loading State -->
-    <div v-if="isLoading" class="loading-state">
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        size="64"
-      ></v-progress-circular>
+    <!-- Название страницы -->
+    <div class="page-header">
+      <h1>{{ team.name }}</h1>
+      <p class="subtitle">{{ team.area?.name }}</p>
     </div>
 
-    <!-- Error State -->
+    <!-- Состояние загрузки -->
+    <v-progress-circular
+      v-if="isLoading"
+      class="d-block mx-auto my-8"
+      color="primary"
+      indeterminate
+    />
+
+    <!-- Состояние ошибки -->
     <v-alert
       v-else-if="error"
       type="error"
@@ -18,146 +23,85 @@
       {{ error }}
     </v-alert>
 
-    <!-- Team Content -->
-    <div v-else class="team-content">
-      <!-- Team Header -->
-      <div class="team-header">
-        <v-img
-          :src="team.crest || '/src/assets/placeholder.svg'"
-          max-width="200"
-          class="team-crest"
-        >
-          <template v-slot:placeholder>
-            <v-row
-              class="fill-height ma-0"
-              align="center"
-              justify="center"
-            >
-              <v-progress-circular
-                indeterminate
-                color="grey-lighten-4"
-              ></v-progress-circular>
-            </v-row>
-          </template>
-        </v-img>
+    <!-- Состояние нет результатов -->
+    <v-alert
+      v-else-if="matches.length === 0"
+      type="info"
+      class="ma-4"
+    >
+      {{ searchQuery ? "No matches found" : "Нет доступных матчей" }}
+    </v-alert>
 
-        <div class="team-info">
-          <h1>{{ team.name }}</h1>
-          <div class="team-details">
-            <div class="detail-item">
-              <v-icon>mdi-map-marker</v-icon>
-              <span>{{ team.area?.name || 'Not specified' }}</span>
-            </div>
-            <div class="detail-item">
-              <v-icon>mdi-trophy</v-icon>
-              <span>{{ team.tla || 'N/A' }}</span>
-            </div>
-            <div class="detail-item">
-              <v-icon>mdi-calendar</v-icon>
-              <span>Founded: {{ team.founded || 'N/A' }}</span>
-            </div>
-            <div class="detail-item">
-              <v-icon>mdi-stadium</v-icon>
-              <span>{{ team.venue || 'N/A' }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Team Tabs -->
-      <v-tabs v-model="activeTab" class="team-tabs">
-        <v-tab value="matches">Matches</v-tab>
-        <v-tab value="squad">Squad</v-tab>
-        <v-tab value="stats">Statistics</v-tab>
-      </v-tabs>
-
-      <v-window v-model="activeTab" class="team-window">
-        <!-- Matches Tab -->
-        <v-window-item value="matches">
-          <div class="matches-section">
-            <h2>Recent Matches</h2>
-            <v-list>
-              <v-list-item
-                v-for="match in matches"
-                :key="match.id"
-                class="match-item"
+    <!-- Таблица матчей -->
+    <template v-else>
+      <v-card class="mb-4">
+        <v-card-text>
+          <v-row align="center">
+            <v-col md="4">
+              <v-date-picker
+                v-model="dateFrom"
+                @update:model-value="onDateChange"
+                color="primary"
+                elevation="2"
+                class="rounded-lg"
+                title="Выберите дату"
+              />
+            </v-col>
+            <v-col md="7">
+              <v-text-field 
+                v-model="formattedDate" 
+                label="Выбранная дата"
+                readonly
+                variant="outlined"
+                density="comfortable"
+                class="mt-4"
+              />
+              <v-btn
+                @click="clearFilter"
+                color="primary"
+                variant="outlined"
+                class="mt-4"
+                block
               >
-                <div class="match-content">
-                  <div class="match-date">
-                    {{ new Date(match.utcDate).toLocaleDateString() }}
-                  </div>
-                  <div class="match-teams">
-                    <span class="team">{{ match.homeTeam.name }}</span>
-                    <span class="score">{{ match.score.fullTime.home || 0 }} - {{ match.score.fullTime.away || 0 }}</span>
-                    <span class="team">{{ match.awayTeam.name }}</span>
-                  </div>
-                  <div class="match-status">
-                    {{ match.status }}
-                  </div>
-                </div>
-              </v-list-item>
-            </v-list>
-          </div>
-        </v-window-item>
+                Очистить фильтр
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
 
-        <!-- Squad Tab -->
-        <v-window-item value="squad">
-          <div class="squad-section">
-            <h2>Team Squad</h2>
-            <v-list>
-              <v-list-item
-                v-for="player in squad"
-                :key="player.id"
-                class="player-item"
-              >
-                <div class="player-content">
-                  <div class="player-name">{{ player.name }}</div>
-                  <div class="player-position">{{ player.position }}</div>
-                  <div class="player-number">#{{ player.shirtNumber || 'N/A' }}</div>
-                </div>
-              </v-list-item>
-            </v-list>
-          </div>
-        </v-window-item>
+      <v-data-table
+        :headers="headers"
+        :items="filteredMatches"
+        :items-per-page="itemsPerPage"
+        class="elevation-1"
+      >
+        <template #item.utcDate="{ item }">
+          {{ new Date(item.utcDate).toLocaleString() }}
+        </template>
 
-        <!-- Statistics Tab -->
-        <v-window-item value="stats">
-          <div class="stats-section">
-            <h2>Team Statistics</h2>
-            <v-card class="stats-card">
-              <v-card-text>
-                <div class="stats-grid">
-                  <div class="stat-item">
-                    <div class="stat-label">Matches Played</div>
-                    <div class="stat-value">{{ stats.matchesPlayed || 0 }}</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-label">Wins</div>
-                    <div class="stat-value">{{ stats.wins || 0 }}</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-label">Draws</div>
-                    <div class="stat-value">{{ stats.draws || 0 }}</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-label">Losses</div>
-                    <div class="stat-value">{{ stats.losses || 0 }}</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-label">Goals For</div>
-                    <div class="stat-value">{{ stats.goalsFor || 0 }}</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-label">Goals Against</div>
-                    <div class="stat-value">{{ stats.goalsAgainst || 0 }}</div>
-                  </div>
-                </div>
-              </v-card-text>
-            </v-card>
-          </div>
-        </v-window-item>
-      </v-window>
-    </div>
+        <template #item.status="{ item }">
+          <v-chip :color="getStatusColor(item.status)" small>
+            {{ getStatusText(item.status) }}
+          </v-chip>
+        </template>
+
+        <template #item.hometeam="{ item }">
+          <b>{{ item.homeTeam?.name }}</b>
+        </template>
+
+        <template #item.awayteam="{ item }">
+          {{ item.awayTeam?.name }}
+        </template>
+
+        <template #item.score="{ item }">
+          {{ item.score.fullTime.homeTeam !== null && item.score.fullTime.awayTeam !== null
+            ? `${item.score.fullTime.homeTeam} - ${item.score.fullTime.awayTeam}`
+            : '-'
+          }}
+        </template>
+      </v-data-table>
+    </template>
   </div>
 </template>
 
@@ -166,15 +110,57 @@ import api from '@/api'
 
 export default {
   name: 'TeamPage',
+  props: {
+    searchQuery: {
+      type: String,
+      default: ''
+    }
+  },
   data() {
     return {
       team: {},
       matches: [],
-      squad: [],
-      stats: {},
       isLoading: true,
       error: null,
-      activeTab: 'matches'
+      page: 1,
+      itemsPerPage: 12,
+      dateFrom: null,
+      headers: [
+        { key: 'utcDate', title: 'Дата' },
+        { key: 'status', title: 'Статус' },
+        { key: 'hometeam', title: 'Хозяева' },
+        { key: 'awayteam', title: 'Гости' },
+        { key: 'score', title: 'Счет' },
+      ],
+    }
+  },
+  computed: {
+    filteredMatches() {
+      if (!this.dateFrom) return this.matches;
+      
+      const selectedDate = new Date(this.dateFrom);
+      selectedDate.setHours(0, 0, 0, 0);
+      
+      return this.matches.filter(match => {
+        const matchDate = new Date(match.utcDate);
+        matchDate.setHours(0, 0, 0, 0);
+        return matchDate.getTime() === selectedDate.getTime();
+      });
+    },
+    formattedDate() {
+      return this.dateFrom ? new Date(this.dateFrom).toLocaleDateString('ru-RU', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }) : '';
+    },
+    totalPages() {
+      return Math.ceil(this.matches.length / this.itemsPerPage)
+    },
+    paginatedMatches() {
+      const start = (this.page - 1) * this.itemsPerPage
+      const end = start + this.itemsPerPage
+      return this.matches.slice(start, end)
     }
   },
   methods: {
@@ -185,49 +171,57 @@ export default {
       try {
         const teamId = this.$route.params.id
         const [teamResponse, matchesResponse] = await Promise.all([
-          api.get(`api/v4/teams/${teamId}`),
-          api.get(`api/v4/teams/${teamId}/matches`)
+          api.get(`api/v2/teams/${teamId}`),
+          api.get(`api/v2/teams/${teamId}/matches`)
         ])
 
         this.team = teamResponse.data
         this.matches = matchesResponse.data.matches
-        this.squad = teamResponse.data.squad || []
-        
-        // Calculate basic statistics
-        this.stats = this.calculateStats()
       } catch (err) {
-        this.error = 'Не удалось загрузить данные по команде. Пожалуйста, попробуйте позже.'
+        this.error = 'Не удалось загрузить данные команды. Пожалуйста, попробуйте позже.'
         console.error('Ошибка загрузки данных команды:', err)
       } finally {
         this.isLoading = false
       }
     },
-    calculateStats() {
-      const stats = {
-        matchesPlayed: this.matches.length,
-        wins: 0,
-        draws: 0,
-        losses: 0,
-        goalsFor: 0,
-        goalsAgainst: 0
+    clearFilter() {
+      this.dateFrom = null
+      this.page = 1
+      this.onDateChange()
+    },
+    getStatusText(status) {
+      const statusMap = {
+        FINISHED: 'Завершен',
+        SCHEDULED: 'Запланирован',
+        LIVE: 'В прямом эфире',
+        POSTPONED: 'Перенесен',
+        CANCELLED: 'Отменен',
+        SUSPENDED: 'Приостановлен',
+        IN_PLAY: 'В игре',
+        PAUSED: 'Пауза',
+        ABANDONED: 'Прерван',
+        TECHNICAL_LOSS: 'Техническое поражение'
       }
-
-      this.matches.forEach(match => {
-        if (match.status === 'FINISHED') {
-          const isHomeTeam = match.homeTeam.id === this.team.id
-          const teamScore = isHomeTeam ? match.score.fullTime.home : match.score.fullTime.away
-          const opponentScore = isHomeTeam ? match.score.fullTime.away : match.score.fullTime.home
-
-          stats.goalsFor += teamScore || 0
-          stats.goalsAgainst += opponentScore || 0
-
-          if (teamScore > opponentScore) stats.wins++
-          else if (teamScore === opponentScore) stats.draws++
-          else stats.losses++
-        }
-      })
-
-      return stats
+      return statusMap[status] || status
+    },
+    getStatusColor(status) {
+      const statusMap = {
+        FINISHED: 'success',
+        SCHEDULED: 'primary',
+        LIVE: 'error',
+        POSTPONED: 'warning',
+        SUSPENDED: 'info',
+        IN_PLAY: 'error',
+        PAUSED: 'warning',
+        POSTPONED: 'warning',
+      }
+      return statusMap[status] || 'grey'
+    },
+    onSearchInput() {
+      this.page = 1
+    },
+    onDateChange() {
+      this.page = 1; // Reset to first page when date changes
     }
   },
   mounted() {
@@ -240,144 +234,22 @@ export default {
 .team-page {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 1rem 1rem;
 }
 
-.loading-state {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-}
-
-.team-header {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
+.page-header {
+  text-align: center;
   margin-bottom: 2rem;
-  padding: 2rem;
-  background: #f5f5f5;
-  border-radius: 8px;
 }
 
-.team-crest {
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.team-info {
-  flex: 1;
-}
-
-.team-info h1 {
+.page-header h1 {
   font-size: 2.5rem;
   color: #1976d2;
-  margin-bottom: 1rem;
-}
-
-.team-details {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-}
-
-.detail-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #666;
-}
-
-.detail-item .v-icon {
-  color: #1976d2;
-}
-
-.team-tabs {
-  margin-bottom: 2rem;
-}
-
-.match-item, .player-item {
-  border-bottom: 1px solid #eee;
-}
-
-.match-content, .player-content {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  width: 100%;
-}
-
-.match-teams {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.score {
-  font-weight: bold;
-  color: #1976d2;
-}
-
-.player-name {
-  flex: 1;
-  font-weight: 500;
-}
-
-.player-position {
-  color: #666;
-  width: 120px;
-}
-
-.player-number {
-  width: 60px;
-  text-align: center;
-  color: #1976d2;
-  font-weight: 500;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1.5rem;
-}
-
-.stat-item {
-  text-align: center;
-  padding: 1rem;
-  background: #f5f5f5;
-  border-radius: 8px;
-}
-
-.stat-label {
-  color: #666;
   margin-bottom: 0.5rem;
 }
 
-.stat-value {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1976d2;
-}
-
-@media (max-width: 768px) {
-  .team-header {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .team-details {
-    grid-template-columns: 1fr;
-  }
-
-  .match-content {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .match-teams {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+.subtitle {
+  color: #666;
+  font-size: 1.1rem;
 }
 </style> 

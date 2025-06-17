@@ -1,12 +1,12 @@
 <template>
   <div class="teams-page">
-    <!-- Page Title -->
+    <!-- Название страницы -->
     <div class="page-header">
       <h1>Футбольные команды</h1>
       <p class="subtitle">и их статистика</p>
     </div>
 
-    <!-- Loading State -->
+    <!-- Состояние загрузки -->
     <div v-if="isLoading" class="loading-state">
       <v-progress-circular
         indeterminate
@@ -15,7 +15,7 @@
       ></v-progress-circular>
     </div>
 
-    <!-- Error State -->
+    <!-- Состояние ошибки -->
     <v-alert
       v-else-if="error"
       type="error"
@@ -24,7 +24,16 @@
       {{ error }}
     </v-alert>
 
-    <!-- Teams Grid -->
+    <!-- Состояние нет результатов -->
+    <v-alert
+      v-else-if="!isLoading && filteredTeams.length === 0"
+      type="info"
+      class="ma-4"
+    >
+      {{ searchQuery ? "No teams found" : "Нет доступных команд" }}
+    </v-alert>
+
+    <!-- Сетка команд -->
     <div v-else class="teams-grid">
       <v-card
         v-for="team in paginatedTeams"
@@ -57,15 +66,6 @@
         </v-card-title>
       </v-card>
     </div>
-
-    <!-- No Results State -->
-    <v-alert
-      v-if="!isLoading && !error && filteredTeams.length === 0"
-      type="info"
-      class="ma-4"
-    >
-      No teams found matching your search criteria.
-    </v-alert>
 
     <!-- Пагинация -->
     <Pagination
