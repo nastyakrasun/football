@@ -243,6 +243,17 @@ export default {
     font-size: 1rem;
   }
 
+  .hero-buttons {
+    flex-direction: column; /* Stacks buttons vertically on mobile */
+    align-items: center; /* Centers buttons horizontally */
+    gap: 1rem;
+  }
+
+  .hero-buttons .v-btn {
+    width: 100%;
+    max-width: 280px;
+  }
+
   .features-grid,
   .quick-access-grid {
     grid-template-columns: 1fr;

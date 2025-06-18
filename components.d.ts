@@ -14,6 +14,8 @@ declare module 'vue' {
     DatePicker: typeof import('./src/components/DatePicker.vue')['default']
     Leagues: typeof import('./src/components/Leagues.vue')['default']
     Matches: typeof import('./src/components/Matches.vue')['default']
+    MatchesList: typeof import('./src/components/MatchesList.vue')['default']
+    MatchesTable: typeof import('./src/components/MatchesTable.vue')['default']
     Pagination: typeof import('./src/components/Pagination.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
