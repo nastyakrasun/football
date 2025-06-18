@@ -34,41 +34,11 @@
 
     <!-- Таблица матчей -->
     <template v-else>
-      <v-card class="mb-4">
-        <v-card-text>
-          <v-row align="center">
-            <v-col md="4">
-              <v-date-picker
-                v-model="dateFrom"
-                @update:model-value="onDateChange"
-                color="primary"
-                elevation="2"
-                class="rounded-lg"
-                title="Выберите дату"
-              />
-            </v-col>
-            <v-col md="7">
-              <v-text-field 
-                v-model="formattedDate" 
-                label="Выбранная дата"
-                readonly
-                variant="outlined"
-                density="comfortable"
-                class="mt-4"
-              />
-              <v-btn
-                @click="clearFilter"
-                color="primary"
-                variant="outlined"
-                class="mt-4"
-                block
-              >
-                Очистить фильтр
-              </v-btn>
-            </v-col>
-          </v-row>
-              </v-card-text>
-            </v-card>
+      <!-- подключение компонента Календарь -->
+      <DatePicker 
+        v-model="dateFrom"
+        @date-change="onDateChange"
+      />
 
       <v-data-table
         :headers="headers"
@@ -107,9 +77,15 @@
 
 <script>
 import api from '@/api'
+// импорт компонента Календарь
+import DatePicker from '@/components/DatePicker.vue'
 
 export default {
   name: 'TeamPage',
+  // использование компонента Календарь
+  components: {
+    DatePicker
+  },
   props: {
     searchQuery: {
       type: String,
@@ -147,13 +123,6 @@ export default {
         return matchDate.getTime() === selectedDate.getTime();
       });
     },
-    formattedDate() {
-      return this.dateFrom ? new Date(this.dateFrom).toLocaleDateString('ru-RU', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      }) : '';
-    },
     totalPages() {
       return Math.ceil(this.matches.length / this.itemsPerPage)
     },
@@ -183,11 +152,6 @@ export default {
       } finally {
         this.isLoading = false
       }
-    },
-    clearFilter() {
-      this.dateFrom = null
-      this.page = 1
-      this.onDateChange()
     },
     getStatusText(status) {
       const statusMap = {
@@ -276,139 +240,6 @@ export default {
   box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
   border: 1px solid rgba(44, 62, 80, 0.05);
   margin-bottom: 2rem;
-}
-
-.v-date-picker {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
-  border: 1px solid rgba(44, 62, 80, 0.05);
-  transition: all 0.3s ease;
-
-  &:hover {
-    box-shadow: 0 6px 20px rgba(44, 62, 80, 0.15);
-  }
-
-  :deep(.v-date-picker-header) {
-    padding: 16px;
-    background-color: #f8f9fa;
-    border-bottom: 1px solid rgba(44, 62, 80, 0.05);
-  }
-
-  :deep(.v-date-picker-header__title) {
-    font: 600 1.1rem/1.2 sans-serif;
-    color: #2c3e50;
-  }
-
-  :deep(.v-date-picker-table) {
-    padding: 8px;
-
-    &__current {
-      color: #3498db;
-      font-weight: 600;
-    }
-
-    &__day {
-  border-radius: 8px;
-      transition: all 0.2s ease;
-
-      &:hover {
-        background-color: rgba(52, 152, 219, 0.1);
-      }
-
-      &--selected {
-        background-color: #3498db !important;
-        color: white !important;
-
-        &:hover {
-          background-color: #2980b9 !important;
-        }
-      }
-
-      &--disabled {
-        color: #bdc3c7 !important;
-      }
-
-      &--adjacent-month {
-        color: #95a5a6;
-      }
-    }
-
-    &__weekday {
-      color: #7f8c8d;
-      font: 500 0.9rem/1 sans-serif;
-    }
-
-    &__month,
-    &__year {
-      color: #2c3e50;
-      font-weight: 500;
-
-      &:hover {
-        background-color: rgba(52, 152, 219, 0.1);
-      }
-
-      &--selected {
-        background-color: #3498db !important;
-        color: white !important;
-      }
-    }
-
-    &__header {
-      padding: 8px;
-      background-color: #f8f9fa;
-
-      &-title {
-        font-weight: 600;
-        color: #2c3e50;
-      }
-
-      &-arrow {
-        color: #3498db;
-
-        &:hover {
-          background-color: rgba(52, 152, 219, 0.1);
-        }
-
-        &--disabled {
-          color: #bdc3c7;
-
-          &:hover {
-            background-color: transparent;
-          }
-        }
-      }
-    }
-  }
-}
-
-.v-text-field {
-  margin-bottom: 1rem;
-}
-
-.v-text-field :deep(.v-field) {
-  border-radius: 8px;
-  transition: all 0.3s ease;
-}
-
-.v-text-field :deep(.v-field:hover) {
-  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.1);
-}
-
-.v-text-field :deep(.v-field--focused) {
-  box-shadow: 0 2px 12px rgba(52, 152, 219, 0.15);
-}
-
-.v-btn {
-  text-transform: none;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  transition: all 0.3s ease;
-}
-
-.v-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
 }
 
 .v-data-table {

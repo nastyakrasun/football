@@ -4,7 +4,7 @@
  * Automatically included in `./src/main.js`
  */
 
-// Plugins
+// Plugins - доп функциональность, которая исп-ся в приложении
 import vuetify from './vuetify'
 import router from '@/router'
 
