@@ -42,7 +42,7 @@ export default {
   name: 'DatePicker',
   props: {
     modelValue: {
-      type: String,
+      type: [String, Date],
       default: null
     }
   },
@@ -50,27 +50,63 @@ export default {
   computed: {
     selectedDate: {
       get() {
-        return this.modelValue
+        if (!this.modelValue) return null;
+        
+        // если получена строка в формате YYYY-MM-DD
+        if (typeof this.modelValue === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(this.modelValue)) {
+          return this.modelValue;
+        }
+        
+        // конвертируем дату в формат YYYY-MM-DD
+        if (this.modelValue instanceof Date) {
+          const year = this.modelValue.getFullYear();
+          const month = String(this.modelValue.getMonth() + 1).padStart(2, '0');
+          const day = String(this.modelValue.getDate()).padStart(2, '0');
+          return `${year}-${month}-${day}`;
+        }
+        
+        // парсим строку, полученную в формате отличном от YYYY-MM-DD
+        if (typeof this.modelValue === 'string') {
+          const date = new Date(this.modelValue);
+          if (!isNaN(date.getTime())) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+          }
+        }
+        
+        return null;
       },
       set(value) {
-        this.$emit('update:modelValue', value)
+        // выбранное значение получено из календаря
+        this.$emit('update:modelValue', value);
       }
     },
     formattedDate() {
-      return this.selectedDate ? new Date(this.selectedDate).toLocaleDateString('ru-RU', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      }) : '';
+      if (!this.selectedDate) return '';
+      
+      try {
+        const date = new Date(this.selectedDate + 'T00:00:00');
+        return date.toLocaleDateString('ru-RU', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      } catch (error) {
+        console.error('Error formatting date:', error);
+        return this.selectedDate;
+      }
     }
   },
   methods: {
     onDateChange() {
-      this.$emit('date-change')
+      this.$emit('date-change');
     },
     clearFilter() {
-      this.selectedDate = null
-      this.$emit('date-change')
+      this.selectedDate = null;
+      this.$emit('update:modelValue', null);
+      this.$emit('date-change');
     }
   }
 }

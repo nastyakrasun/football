@@ -238,11 +238,11 @@ export default {
   .hero h1 {
     font-size: 2rem;
   }
-  
+
   .hero p {
     font-size: 1rem;
   }
-  
+
   .features-grid,
   .quick-access-grid {
     grid-template-columns: 1fr;

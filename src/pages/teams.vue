@@ -129,7 +129,7 @@ export default {
       try {
         const response = await api.get('api/v4/teams')
         if (response.data && Array.isArray(response.data.teams)) {
-          this.teams = response.data.teams
+        this.teams = response.data.teams
           this.page = 1 // Reset to first page when new data is loaded
         } else {
           throw new Error('Неверный формат данных')

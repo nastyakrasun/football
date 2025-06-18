@@ -114,7 +114,18 @@ export default {
     filteredMatches() {
       if (!this.dateFrom) return this.matches;
       
-      const selectedDate = new Date(this.dateFrom);
+      // конвертируем dateFrom в единый формат для сравнения
+      let selectedDate;
+      if (this.dateFrom instanceof Date) {
+        selectedDate = this.dateFrom;
+      } else if (typeof this.dateFrom === 'string') {
+        // парсим строку даты и приводим к полуночи для предотвращения расхождения часовых поясов
+        selectedDate = new Date(this.dateFrom + 'T00:00:00');
+      } else {
+        return this.matches;
+      }
+      
+      // приводим к полуночи для точного сравнения дат
       selectedDate.setHours(0, 0, 0, 0);
       
       return this.matches.filter(match => {
