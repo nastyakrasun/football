@@ -40,8 +40,17 @@
         @date-change="onDateChange"
       />
 
+      <!-- No matches for selected date (both desktop and mobile) -->
+      <v-alert
+        v-if="filteredMatches.length === 0"
+        type="info"
+        class="ma-4"
+      >
+        Нет матчей на выбранную дату
+      </v-alert>
+
       <!-- Desktop Table View -->
-      <div class="desktop-view">
+      <div class="desktop-view" v-if="filteredMatches.length > 0">
         <v-data-table
           :headers="headers"
           :items="filteredMatches"
@@ -73,7 +82,7 @@
       </div>
 
       <!-- Mobile Card View -->
-      <div class="mobile-view">
+      <div class="mobile-view" v-if="filteredMatches.length > 0">
         <div class="matches-cards">
           <v-card
             v-for="match in filteredMatches"
