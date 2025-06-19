@@ -65,7 +65,7 @@ export default {
   name: 'HomePage',
   data() {
     return {
-      features: [
+      features: [ // features - это реактивный массив. Если я добавлю, удалю или изменю элемент в features, пользовательский интерфейс обновится автоматически
         {
           icon: 'mdi-trophy',
           //icon: 'free-icon-football-club-919408.png',

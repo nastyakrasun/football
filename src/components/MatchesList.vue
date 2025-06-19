@@ -15,8 +15,8 @@
       ></v-progress-circular>
     </div>
 
-    <!-- Состояние ошибки -->
-    <v-alert
+    <!-- Состояние ошибки - сообщение об ошибке отображается в пользовательском интерфейсе -->
+    <v-alert 
       v-else-if="error"
       type="error"
       class="ma-4"
@@ -115,11 +115,11 @@ export default {
   },
   data() {
     return {
-      items: [],
-      isLoading: true,
-      error: null,
-      page: 1,
-      itemsPerPage: this.entityType === 'league' ? 9 : 10 // 3x3 for leagues, 5x2 for teams
+      items: [],        // REACTIVE: список лиг/команд
+      isLoading: true,  // REACTIVE: состояние загрузки
+      error: null,      // REACTIVE: сообщение об ошибке
+      page: 1,          // REACTIVE: текущая страница пагинации
+      itemsPerPage: this.entityType === 'league' ? 9 : 10 // REACTIVE: количество элементов данных на странице
     }
   },
   computed: {
@@ -154,27 +154,28 @@ export default {
     }
   },
   methods: {
-    async fetchData() {
+    async fetchData() { // использую `async fetchData()" с "await api.get(...)" для получения данных с сервера
       this.isLoading = true
       this.error = null
       
-      try {
+      try { // пытается получить данные из API
         const endpoint = this.entityType === 'league' ? 'api/v4/competitions' : 'api/v4/teams'
-        const response = await api.get(endpoint)
+        const response = await api.get(endpoint) // await api.get(...) используется для получения данных с сервера
         
         const dataKey = this.entityType === 'league' ? 'competitions' : 'teams'
-        
+        // результат сохраняется в реактивных переменных (this.items, this.entity, this.matches)
         if (response.data && Array.isArray(response.data[dataKey])) {
           this.items = response.data[dataKey]
           this.page = 1 // Reset to first page when new data is loaded
         } else {
           throw new Error('Неверный формат данных')
         }
-      } catch (err) {
+        // Если запрос не выполняется или формат данных неверен, блок catch присваивает реактивной переменной error понятное сообщение об ошибке
+      } catch (err) { // ошибки перехватываются и обрабатываются
         this.error = err.message === 'Неверный формат данных' 
           ? 'Ошибка в формате данных. Пожалуйста, попробуйте позже.'
           : `Не удалось загрузить ${this.entityTypeText}. Пожалуйста, попробуйте позже.`
-        console.error(`Ошибка загрузки ${this.entityTypeText}:`, err)
+        console.error(`Loading error ${this.entityTypeText}:`, err)
       } finally {
         this.isLoading = false
       }
@@ -195,17 +196,17 @@ export default {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   },
-  watch: {
+  watch: { // перехватчик жизненного цикла, используется для реагирования на изменения в prop 
     searchQuery() {
-      this.page = 1 // Reset to first page when search query changes
+      this.page = 1 // перенаправление на страницу 1 при изменении searchQuery
     },
-    entityType() {
+    entityType() { // при изменении entityType количество элементов на странице обновляется и извлекаются новые данные
       this.itemsPerPage = this.entityType === 'league' ? 9 : 10
       this.fetchData()
     }
   },
   mounted() {
-    this.fetchData()
+    this.fetchData() // Метод вызывается в перехватчике жизненного цикла mounted(), поэтому данные загружаются при появлении компонента
   }
 }
 </script>

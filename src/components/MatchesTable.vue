@@ -236,29 +236,29 @@ export default {
     },
     getStatusText(status) {
       const statusMap = {
-        FINISHED: 'Завершен',
         SCHEDULED: 'Запланирован',
         LIVE: 'В прямом эфире',
-        POSTPONED: 'Перенесен',
-        CANCELLED: 'Отменен',
-        SUSPENDED: 'Приостановлен',
         IN_PLAY: 'В игре',
         PAUSED: 'Пауза',
+        FINISHED: 'Завершен',
+        POSTPONED: 'Перенесен',
+        SUSPENDED: 'Приостановлен',
+        CANCELLED: 'Отменен',        
         ABANDONED: 'Прерван',
         TECHNICAL_LOSS: 'Техническое поражение'
       }
       return statusMap[status] || status
     },
     getStatusColor(status) {
-      const statusMap = {
-        FINISHED: 'success',
+      const statusMap = {        
         SCHEDULED: 'primary',
         LIVE: 'error',
-        POSTPONED: 'warning',
-        CANCELLED: 'warning',
-        SUSPENDED: 'info',
         IN_PLAY: 'error',
         PAUSED: 'warning',
+        FINISHED: 'success',
+        POSTPONED: 'warning',        
+        SUSPENDED: 'info',
+        CANCELLED: 'warning',        
         ABANDONED: 'error',
         TECHNICAL_LOSS: 'error'
       }
@@ -289,7 +289,7 @@ export default {
         return match.score.fullTime.awayTeam !== null ? match.score.fullTime.awayTeam : '-'
       }
     },
-    formatMatchDate(dateString) {
+    formatMatchDate(dateString) { // форматирование даты с русской локализацией и учетом часового пояса
       const date = new Date(dateString)
       return date.toLocaleDateString('ru-RU', {
         day: '2-digit',

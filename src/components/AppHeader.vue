@@ -35,9 +35,11 @@
 
       <!-- Правая секция -->
       <div class="header-right">
-        <!-- Поиск -->
+        <!-- Поиск, двусторонняя привязка -->
+        <!-- v-model="searchQuery" связывает значение поля ввода с переменной searchQuery в data -->
+        <!-- при изменении текста в поле ввода значение searchQuery автоматически обновляется, и наоборот -->
         <v-text-field
-          v-model="searchQuery"
+          v-model="searchQuery" 
           placeholder="Поиск..."
           prepend-inner-icon="mdi-magnify"
           clearable
@@ -57,7 +59,7 @@ export default {
   name: 'AppHeader',
   data() {
     return {
-      searchQuery: "",
+      searchQuery: "", // Реактивное свойство, связанное с v-model
       };
   },
   methods: {
