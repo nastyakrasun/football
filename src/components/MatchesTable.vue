@@ -252,7 +252,8 @@ export default {
         FINISHED: 'Завершен',
         POSTPONED: 'Перенесен',
         SUSPENDED: 'Приостановлен',
-        CANCELLED: 'Отменен',        
+        CANCELLED: 'Отменен', 
+        TIMED: 'Назначен',       
         ABANDONED: 'Прерван',
         TECHNICAL_LOSS: 'Техническое поражение'
       }
@@ -267,7 +268,8 @@ export default {
         FINISHED: 'success',
         POSTPONED: 'warning',        
         SUSPENDED: 'info',
-        CANCELLED: 'warning',        
+        CANCELLED: 'warning',
+        TIMED: 'primary',        
         ABANDONED: 'error',
         TECHNICAL_LOSS: 'error'
       }

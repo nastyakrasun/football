@@ -30,7 +30,7 @@
       type="info"
       class="ma-4"
     >
-      {{ searchQuery ? `No ${entityType}s found` : `Нет доступных ${entityTypeText}` }}
+      {{ searchQuery ? (entityType === 'league' ? 'Лиг не найдено' : 'Команд не найдено') : `Нет доступных ${entityTypeText}` }}
     </v-alert>
 
     <!-- Сетка элементов -->
