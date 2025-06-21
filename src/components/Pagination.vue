@@ -59,7 +59,7 @@ export default {
 .pagination button {
   padding: 8px 12px;
   border: 1px solid #ddd;
-  background-color: white;
+  background-color: var(--v-theme-surface);
   cursor: pointer;
   border-radius: 4px;
   min-width: 36px;
@@ -69,6 +69,7 @@ export default {
   justify-content: center;
   font-size: 14px;
   transition: all 0.3s;
+  color: var(--v-theme-text);
 }
 
 .pagination button:disabled {
@@ -81,9 +82,9 @@ export default {
 }
 
 .pagination button.active {
-  background-color: #1976d2;
-  color: white;
-  border-color: #1976d2;
+  background-color: var(--v-theme-primary);
+  color: var(--v-theme-on-primary, #fff);
+  border-color: var(--v-theme-primary);
 }
 
 .page-numbers {

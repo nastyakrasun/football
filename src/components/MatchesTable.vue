@@ -29,7 +29,7 @@
       type="info"
       class="ma-4"
     >
-      {{ searchQuery ? "No matches found" : "Нет доступных матчей" }}
+      {{ searchQuery ? $t('app.no_matches_found') : $t('app.no_matches_available') }}
     </v-alert>
 
     <!-- Таблица матчей -->
@@ -46,7 +46,7 @@
         type="info"
         class="ma-4"
       >
-        Нет матчей на выбранную дату
+        {{$t('app.no_matches_selected_date')}}
       </v-alert>
 
       <!-- Desktop Table View -->
@@ -56,27 +56,36 @@
           :items="filteredMatches"
           :items-per-page="itemsPerPage"
           class="elevation-1"
+          :footer-props="{ 'items-per-page-text': $t('app.items_per_page') }"
         >
-          <template #item.utcDate="{ item }">
-            {{ new Date(item.utcDate).toLocaleString() }}
+          <template #headers="{ columns }">
+            <tr>
+              <th v-for="column in columns" :key="column.key" :style="{ backgroundColor: thBg, color: thColor }">
+                {{ column.title }}
+              </th>
+            </tr>
           </template>
 
-          <template #item.status="{ item }">
-            <v-chip :color="getStatusColor(item.status)" small>
-              {{ getStatusText(item.status) }}
-            </v-chip>
-          </template>
-
-          <template #item.hometeam="{ item }">
-            <b>{{ item.homeTeam?.name }}</b>
-          </template>
-
-          <template #item.awayteam="{ item }">
-            {{ item.awayTeam?.name }}
-          </template>
-
-          <template #item.score="{ item }">
-            {{ getScoreText(item) }}
+          <template #item="{ item, columns }">
+            <tr>
+              <td v-for="column in columns" :key="column.key" :style="{ color: thColor }">
+                <span v-if="column.key === 'utcDate'">{{ new Date(item.utcDate).toLocaleString() }}</span>
+                <span v-else-if="column.key === 'status'">
+                  <v-chip :color="getStatusColor(item.status)" small>
+                    {{ getStatusText(item.status) }}
+                  </v-chip>
+                </span>
+                <span v-else-if="column.key === 'hometeam'">
+                  <b>{{ item.homeTeam?.name }}</b>
+                </span>
+                <span v-else-if="column.key === 'awayteam'">
+                  {{ item.awayTeam?.name }}
+                </span>
+                <span v-else-if="column.key === 'score'">
+                  {{ getScoreText(item) }}
+                </span>
+              </td>
+            </tr>
           </template>
         </v-data-table>
       </div>
@@ -111,8 +120,8 @@
               <!-- Teams and Score -->
               <div class="match-teams">
                 <div class="team home-team">
-                  <div class="team-name">{{ match.homeTeam?.name }}</div>
-                  <div class="team-score">{{ getHomeScore(match) }}</div>
+                  <div class="team-name" :style="{ color: thColor, fontWeight: 'bold' }">{{ match.homeTeam?.name }}</div>
+                  <div class="team-score" :style="{ color: thColor }">{{ getHomeScore(match) }}</div>
                 </div>
                 
                 <div class="vs-divider">
@@ -120,8 +129,8 @@
                 </div>
                 
                 <div class="team away-team">
-                  <div class="team-name">{{ match.awayTeam?.name }}</div>
-                  <div class="team-score">{{ getAwayScore(match) }}</div>
+                  <div class="team-name" :style="{ color: thColor, fontWeight: 'normal' }">{{ match.awayTeam?.name }}</div>
+                  <div class="team-score" :style="{ color: thColor }">{{ getAwayScore(match) }}</div>
                 </div>
               </div>
 
@@ -141,6 +150,8 @@
 <script>
 import api from '@/api'
 import DatePicker from '@/components/DatePicker.vue'
+import { useTheme } from 'vuetify'
+import { computed } from 'vue'
 
 export default {
   name: 'MatchesTable',
@@ -171,14 +182,13 @@ export default {
       page: 1,
       itemsPerPage: 10,
       dateFrom: null,
-      headers: [
-        { key: 'utcDate', title: 'Дата' },
-        { key: 'status', title: 'Статус' },
-        { key: 'hometeam', title: 'Хозяева' },
-        { key: 'awayteam', title: 'Гости' },
-        { key: 'score', title: 'Счет' },
-      ],
     }
+  },
+  setup() {
+    const theme = useTheme()
+    const thBg = computed(() => theme.global.name.value === 'dark' ? '#2c3e50' : '#f8f9fa')
+    const thColor = computed(() => theme.global.name.value === 'dark' ? '#f8f9fa' : '#2c3e50')
+    return { thBg, thColor }
   },
   computed: {
     filteredMatches() {
@@ -211,6 +221,15 @@ export default {
       const start = (this.page - 1) * this.itemsPerPage
       const end = start + this.itemsPerPage
       return this.matches.slice(start, end)
+    },
+    headers() {
+      return [
+        { key: 'utcDate', title: this.$t('app.table_date') },
+        { key: 'status', title: this.$t('app.table_status') },
+        { key: 'hometeam', title: this.$t('app.table_home') },
+        { key: 'awayteam', title: this.$t('app.table_away') },
+        { key: 'score', title: this.$t('app.table_score') },
+      ];
     }
   },
   methods: {
@@ -245,17 +264,17 @@ export default {
     },
     getStatusText(status) {
       const statusMap = {
-        SCHEDULED: 'Запланирован',
-        LIVE: 'В прямом эфире',
-        IN_PLAY: 'В игре',
-        PAUSED: 'Пауза',
-        FINISHED: 'Завершен',
-        POSTPONED: 'Перенесен',
-        SUSPENDED: 'Приостановлен',
-        CANCELLED: 'Отменен', 
-        TIMED: 'Назначен',       
-        ABANDONED: 'Прерван',
-        TECHNICAL_LOSS: 'Техническое поражение'
+        SCHEDULED: this.$t('app.status_scheduled'),
+        LIVE: this.$t('app.status_live'),
+        IN_PLAY: this.$t('app.status_in_play'),
+        PAUSED: this.$t('app.status_paused'),
+        FINISHED: this.$t('app.status_finished'),
+        POSTPONED: this.$t('app.status_postponed'),
+        SUSPENDED: this.$t('app.status_suspended'),
+        CANCELLED: this.$t('app.status_cancelled'),
+        TIMED: this.$t('app.status_timed'),
+        ABANDONED: this.$t('app.status_abandoned'),
+        TECHNICAL_LOSS: this.$t('app.status_technical_loss'),
       }
       return statusMap[status] || status
     },
@@ -379,7 +398,7 @@ export default {
 }
 
 .v-data-table {
-  background: white;
+  background-color: var(--v-theme-surface);
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
@@ -387,8 +406,6 @@ export default {
 }
 
 .v-data-table :deep(th) {
-  background-color: #f8f9fa !important;
-  color: #2c3e50 !important;
   font-weight: 600 !important;
   font-size: 0.95rem !important;
   text-transform: none !important;
@@ -396,7 +413,6 @@ export default {
 }
 
 .v-data-table :deep(td) {
-  color: #2c3e50 !important;
   font-size: 0.95rem !important;
 }
 
@@ -421,6 +437,7 @@ export default {
   border-radius: 12px;
   transition: all 0.3s ease;
   border: 1px solid rgba(44, 62, 80, 0.1);
+  background-color: var(--v-theme-surface);
 }
 
 .match-card:hover {

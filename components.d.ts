@@ -9,9 +9,13 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AppFooter: typeof import('./src/components/AppFooter.vue')['default']
+    AppFooterMob: typeof import('./src/components/AppFooterMob.vue')['default']
     AppHeader: typeof import('./src/components/AppHeader.vue')['default']
+    AppHeaderMob: typeof import('./src/components/AppHeaderMob.vue')['default']
     DateFilter: typeof import('./src/components/DateFilter.vue')['default']
     DatePicker: typeof import('./src/components/DatePicker.vue')['default']
+    DatePickerButton: typeof import('./src/components/DatePickerButton.vue')['default']
+    LanguageChange: typeof import('./src/components/LanguageChange.vue')['default']
     Leagues: typeof import('./src/components/Leagues.vue')['default']
     Matches: typeof import('./src/components/Matches.vue')['default']
     MatchesList: typeof import('./src/components/MatchesList.vue')['default']
@@ -20,5 +24,6 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Teams: typeof import('./src/components/Teams.vue')['default']
+    ThemeChange: typeof import('./src/components/ThemeChange.vue')['default']
   }
 }

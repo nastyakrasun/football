@@ -5,22 +5,22 @@
     <!-- Секция Hero -->
     <section class="hero">
       <div class="hero-content">
-        <h1>Добро пожаловать в SoccerStat</h1>
-        <p>ваш главный источник информации о спортивной статистике</p>
+        <h1>{{$t('app.welcome')}}</h1>
+        <p>{{$t('app.hero_desc')}}</p>
         <div class="hero-buttons">
           <v-btn
             color="primary"
             size="large"
             @click="$router.push('/leagues')"
           >
-            Список лиг
+            {{$t('app.leagues_list')}}
           </v-btn>
           <v-btn
-            color="secondary"
+            style="background-color: #259ea6; color: white;"
             size="large"
             @click="$router.push('/teams')"
           >
-            Список команд
+            {{$t('app.teams_list')}}
           </v-btn>
         </div>
       </div>
@@ -28,7 +28,7 @@
 
     <!-- Фичи -->
     <section class="features">
-      <h2>Мы предлагаем</h2>
+      <h2>{{$t('app.features_title')}}</h2>
       <div class="features-grid">
         <v-card
           v-for="feature in features"
@@ -51,8 +51,8 @@
               height="48"
               class="feature-icon mx-auto"
             ></v-img>  -->
-            <h3>{{ feature.title }}</h3>
-            <p>{{ feature.description }}</p>
+            <h3>{{$t(feature.title)}}</h3>
+            <p>{{$t(feature.description)}}</p>
           </v-card-text>
         </v-card>
       </div>
@@ -69,15 +69,15 @@ export default {
         {
           icon: 'mdi-trophy',
           //icon: 'free-icon-football-club-919408.png',
-          title: 'Лиги',
-          description: 'Ознакомиться с футбольными лигами',
+          title: 'app.leagues_feature_title',
+          description: 'app.leagues_feature_desc',
           route: '/leagues'
         },
         {
           icon: 'mdi-account-group',
           //icon: 'free-icon-soccer-player-919397.png',
-          title: 'Команды',
-          description: 'Просмотреть матчи и статистику команд',
+          title: 'app.teams_feature_title',
+          description: 'app.teams_feature_desc',
           route: '/teams'
         }
       ]
@@ -91,7 +91,9 @@ export default {
   max-width: 1200px; /* максимальная ширина страницы */
   margin: 0 auto; /* центрирование страницы по горизонтали */
   padding: 1rem 1rem; /* добавление отступов вокруг содержимого */
-  background-color: #f8f9fa;
+  background: var(--v-theme-background);
+  min-height: 100vh;
+  color: var(--v-theme-text);
 }
 
 .hero {
@@ -114,6 +116,7 @@ export default {
   margin-bottom: 1rem;
   font-weight: 700;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  color: var(--v-theme-text);
 }
 
 .hero p {
@@ -137,7 +140,7 @@ export default {
   text-align: center;
   font-size: 2rem;
   margin-bottom: 2rem;
-  color: #2c3e50;
+  color: #23609a;
   font-weight: 600;
 }
 
@@ -152,10 +155,19 @@ export default {
   cursor: pointer;
   transition: all 0.3s ease;
   text-align: center;
-  background: white;
+  background-color: var(--v-theme-surface);
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid rgba(44, 62, 80, 0.1);
+  border: 2px solid rgba(44, 62, 80, 0.22);
+  color: var(--v-theme-text);
+  box-shadow: 0 4px 15px rgba(44, 62, 80, 0.10);
+}
+
+@media (prefers-color-scheme: dark) {
+  .feature-card {
+    border: 2px solid rgba(200, 220, 255, 0.22);
+    box-shadow: 0 8px 32px rgba(44, 62, 80, 0.22);
+  }
 }
 
 .feature-card:hover {
@@ -172,7 +184,7 @@ export default {
 .feature-card h3 {
   font-size: 1.5rem;
   margin-bottom: 0.75rem;
-  color: #2c3e50;
+  color: #3498db;
   font-weight: 600;
 }
 

@@ -2,21 +2,21 @@
   <v-card class="mb-4">
     <v-card-text>
       <v-row align="center">
-        <v-col md="4">
+        <v-col cols="12" md="4">
           <v-date-picker
             v-model="selectedDate"
             @update:model-value="onDateChange"
             color="primary"
             elevation="2"
             class="rounded-lg"
-            title="Календарь соревнований"
-            header="выберите дату"
+            :title="$t('app.title')"
+            :header="$t('app.selectedDate')"
           />
         </v-col>
-        <v-col md="7">
+        <v-col cols="12" md="7">
           <v-text-field 
             v-model="formattedDate" 
-            label="Выбранная дата"
+            :label="$t('app.selectedDate')"
             readonly
             variant="outlined"
             density="comfortable"
@@ -29,7 +29,7 @@
             class="mt-4"
             block
           >
-            Очистить фильтр
+            {{$t('app.clear')}}
           </v-btn>
         </v-col>
       </v-row>
@@ -114,11 +114,17 @@ export default {
 
 <style scoped>
 .v-date-picker {
-  background: white;
+  background: var(--v-theme-surface);
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
-  border: 1px solid rgba(44, 62, 80, 0.05);
+  border: 2px solid rgba(44, 62, 80, 0.18);
   transition: all 0.3s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  .v-date-picker {
+    border: 2px solid rgba(200, 220, 255, 0.22);
+  }
 }
 
 .v-date-picker:hover {
@@ -239,5 +245,26 @@ export default {
 .v-text-field :deep(.v-field) {
   border-radius: 8px;
   transition: all 0.3s ease;
+}
+
+/* Responsive styles for DatePicker */
+@media (max-width: 768px) {
+  .v-card.mb-4 {
+    padding: 0.5rem 0.25rem;
+  }
+  .v-card-text {
+    padding: 0.5rem 0.25rem;
+  }
+  .v-date-picker {
+    font-size: 0.95rem;
+    min-width: 100%;
+  }
+  .v-text-field {
+    margin-top: 1rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+  .v-btn.mt-4 {
+    margin-top: 0.5rem !important;
+  }
 }
 </style> 

@@ -2,8 +2,8 @@
   <div class="matches-list">
     <!-- Название страницы -->
     <div class="page-header">
-      <h1>{{ pageTitle }}</h1>
-      <p class="subtitle">{{ pageSubtitle }}</p>
+      <h1>{{$t(pageTitleKey)}}</h1>
+      <p class="subtitle">{{$t('app.page_subtitle')}}</p>
     </div>
 
     <!-- Состояние загрузки -->
@@ -30,7 +30,10 @@
       type="info"
       class="ma-4"
     >
-      {{ searchQuery ? (entityType === 'league' ? 'Лиг не найдено' : 'Команд не найдено') : `Нет доступных ${entityTypeText}` }}
+      {{ searchQuery
+        ? $t(entityType === 'league' ? 'app.not_found_leagues' : 'app.not_found_teams')
+        : $t(entityType === 'league' ? 'app.not_available_leagues' : 'app.not_available_teams')
+      }}
     </v-alert>
 
     <!-- Сетка элементов -->
@@ -75,7 +78,7 @@
                   height="24"
                   class="info-icon"
                 />
-                <span>{{ item.area?.name || 'Не указано' }}</span>
+                <span>{{ item.area?.name || $t('app.not_specified') }}</span>
               </div>
             </div>
           </v-card-text>
@@ -123,11 +126,8 @@ export default {
     }
   },
   computed: {
-    pageTitle() {
-      return this.entityType === 'league' ? 'Футбольные лиги' : 'Футбольные команды'
-    },
-    pageSubtitle() {
-      return 'и их статистика'
+    pageTitleKey() {
+      return this.entityType === 'league' ? 'app.page_title_leagues' : 'app.page_title_teams'
     },
     entityTypeText() {
       return this.entityType === 'league' ? 'лиг' : 'команд'
@@ -174,7 +174,7 @@ export default {
       } catch (err) { // ошибки перехватываются и обрабатываются
         this.error = err.message === 'Неверный формат данных' 
           ? 'Ошибка в формате данных. Пожалуйста, попробуйте позже.'
-          : `Не удалось загрузить ${this.entityTypeText}. Пожалуйста, попробуйте позже.`
+          : `Не удалось загрузить список ${this.entityTypeText}. Пожалуйста, попробуйте позже.`
         console.error(`Loading error ${this.entityTypeText}:`, err)
       } finally {
         this.isLoading = false
@@ -239,7 +239,7 @@ export default {
 
 .page-header h1 {
   font-size: 2.8rem;
-  color: #2c3e50;
+  color: #3498db;
   margin-bottom: 0.75rem;
   font-weight: 700;
   letter-spacing: -0.5px;
@@ -271,8 +271,14 @@ export default {
   transition: all 0.3s ease;
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid rgba(44, 62, 80, 0.1);
-  background: white;
+  border: 2px solid rgba(44, 62, 80, 0.22);
+  background-color: var(--v-theme-surface);
+}
+
+@media (prefers-color-scheme: dark) {
+  .league-card {
+    border: 2px solid rgba(200, 220, 255, 0.22);
+  }
 }
 
 .league-card:hover {
@@ -282,7 +288,7 @@ export default {
 }
 
 .league-image {
-  background-color: #f8f9fa;
+  background-color: var(--v-theme-surface);
   padding: 1.5rem;
   display: flex;
   align-items: center;
@@ -310,8 +316,14 @@ export default {
   transition: all 0.3s ease;
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid rgba(44, 62, 80, 0.1);
-  background: white;
+  border: 2px solid rgba(44, 62, 80, 0.22);
+  background-color: var(--v-theme-surface);
+}
+
+@media (prefers-color-scheme: dark) {
+  .team-card {
+    border: 2px solid rgba(200, 220, 255, 0.22);
+  }
 }
 
 .team-card:hover {
@@ -321,7 +333,7 @@ export default {
 }
 
 .team-image {
-  background-color: #f8f9fa;
+  background-color: var(--v-theme-surface);
   padding: 1.5rem;
   display: flex;
   align-items: center;

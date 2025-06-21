@@ -5,11 +5,140 @@
  */
 
 // Plugins - доп функциональность, которая исп-ся в приложении
-import vuetify from './vuetify'
-import router from '@/router'
+import vuetify from "./vuetify";
+import router from "@/router";
+import { createI18n } from "vue-i18n";
 
-export function registerPlugins (app) {
-  app
-    .use(vuetify)
-    .use(router)
+const messages = {
+  en: {
+    app: {
+      title: "SoccerStat",
+      home: "Home",
+      leagues: "Leagues",
+      teams: "Teams",
+      search: "Search...",
+      clear: "Clear filter",
+      selectedDate: "Selected date",
+      noMatches: "No matches for selected date",
+      contacts: "Contacts",
+      email: "Email",
+      copyright: "All rights reserved.",
+      social_vk: "VK",
+      social_telegram: "Telegram",
+      social_whatsapp: "WhatsApp",
+      about: "About us",
+      about_desc:
+        "Give a full information about football matches in leagues (competitions) and team matches in real time.",
+      go_to: "Go to",
+      welcome: "Welcome to SoccerStat",
+      hero_desc: "Your main source for sports statistics",
+      leagues_list: "Leagues list",
+      teams_list: "Teams list",
+      features_title: "We offer",
+      leagues_feature_title: "Leagues",
+      leagues_feature_desc: "Explore football leagues",
+      teams_feature_title: "Teams",
+      teams_feature_desc: "View team matches and statistics",
+      page_title_leagues: "Football Leagues",
+      page_title_teams: "Football Teams",
+      page_subtitle: "and their statistics",
+      not_found_leagues: "No leagues found",
+      not_found_teams: "No teams found",
+      not_available_leagues: "No leagues available",
+      not_available_teams: "No teams available",
+      not_specified: "Not specified",
+      no_matches_found: "No matches found",
+      no_matches_available: "No matches available",
+      no_matches_selected_date: "No matches for the selected date",
+      table_date: "Date",
+      table_status: "Status",
+      table_home: "Home",
+      table_away: "Away",
+      table_score: "Score",
+      status_scheduled: "Scheduled",
+      status_live: "Live",
+      status_in_play: "In play",
+      status_paused: "Paused",
+      status_finished: "Finished",
+      status_postponed: "Postponed",
+      status_suspended: "Suspended",
+      status_cancelled: "Cancelled",
+      status_timed: "Timed",
+      status_abandoned: "Abandoned",
+      status_technical_loss: "Technical loss",
+      items_per_page: "Items per page:",
+      of: "of",
+    },
+  },
+  ru: {
+    app: {
+      title: "SoccerStat",
+      home: "Главная",
+      leagues: "Лиги",
+      teams: "Команды",
+      search: "Поиск...",
+      clear: "Очистить фильтр",
+      selectedDate: "Выбранная дата",
+      noMatches: "Нет матчей на выбранную дату",
+      contacts: "Контакты",
+      email: "Эл. почта",
+      copyright: "Все права защищены.",
+      social_vk: "ВКонтакте",
+      social_telegram: "Телеграм",
+      social_whatsapp: "Ватсап",
+      about: "О нас",
+      about_desc:
+        "Предоставляем информацию о футбольных матчах в рамках лиги (соревнований) и матчах команд в режиме реального времени",
+      go_to: "Перейти",
+      welcome: "Добро пожаловать в SoccerStat",
+      hero_desc: "Ваш главный источник информации о спортивной статистике",
+      leagues_list: "Список лиг",
+      teams_list: "Список команд",
+      features_title: "Мы предлагаем",
+      leagues_feature_title: "Лиги",
+      leagues_feature_desc: "Ознакомиться с футбольными лигами",
+      teams_feature_title: "Команды",
+      teams_feature_desc: "Просмотреть матчи и статистику команд",
+      page_title_leagues: "Футбольные лиги",
+      page_title_teams: "Футбольные команды",
+      page_subtitle: "и их статистика",
+      not_found_leagues: "Лиг не найдено",
+      not_found_teams: "Команд не найдено",
+      not_available_leagues: "Нет доступных лиг",
+      not_available_teams: "Нет доступных команд",
+      not_specified: "Не указано",
+      no_matches_found: "Матчей не найдено",
+      no_matches_available: "Нет доступных матчей",
+      no_matches_selected_date: "Нет матчей на выбранную дату",
+      table_date: "Дата",
+      table_status: "Статус",
+      table_home: "Хозяева",
+      table_away: "Гости",
+      table_score: "Счет",
+      status_scheduled: "Запланирован",
+      status_live: "В прямом эфире",
+      status_in_play: "В игре",
+      status_paused: "Пауза",
+      status_finished: "Завершен",
+      status_postponed: "Перенесен",
+      status_suspended: "Приостановлен",
+      status_cancelled: "Отменен",
+      status_timed: "Назначен",
+      status_abandoned: "Прерван",
+      status_technical_loss: "Техническое поражение",
+      items_per_page: "Записей на странице:",
+      of: "из",
+    },
+  },
+};
+
+const i18n = createI18n({
+  legacy: false,
+  locale: "ru",
+  fallbackLocale: "en",
+  messages,
+});
+
+export function registerPlugins(app) {
+  app.use(vuetify).use(router).use(i18n);
 }
