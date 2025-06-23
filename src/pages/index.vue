@@ -1,569 +1,294 @@
-<!-- Главная страница с таблицей всех матчей -->
-<template>
-  <div class="matches-page">
-    <!-- Заголовок страницы -->
-    <div class="page-header">
-      <h1>{{ $t('app.all_matches') }}</h1>
-      <p class="subtitle">{{ $t('app.all_matches_subtitle') }}</p>
-    </div>
-
-    <!-- Состояние загрузки -->
-    <v-progress-circular
-      v-if="isLoading"
-      class="d-block mx-auto my-8"
+<!--serves as the root route (/) of application, renders the Leagues component, which displays a list of football leagues!-->More actions
+<!-- то, что мы видим на главной странице -->
+<template> <!-- элемент, в котором показывается основной шаблон, который отображает мои данные -->
+  <div class="home-page">
+    <!-- Секция Hero -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Добро пожаловать в SoccerStat</h1>
+        <p>ваш главный источник информации о спортивной статистике</p>
+        <div class="hero-buttons">
+          <v-btn
             color="primary"
-      indeterminate
-    />
-
-    <!-- Состояние ошибки -->
-    <v-alert
-      v-else-if="error"
-      type="error"
-      class="ma-4"
-    >
-      {{ error }}
-    </v-alert>
-
-    <!-- Состояние нет результатов -->
-    <v-alert
-      v-else-if="filteredMatches.length === 0"
-      type="info"
-      class="ma-4"
-    >
-      {{ searchQuery ? $t('app.no_matches_found') : $t('app.no_matches_available') }}
-    </v-alert>
-
-    <!-- Таблица матчей -->
-    <template v-else>
-      <!-- Desktop Table View -->
-      <div class="desktop-view" v-if="filteredMatches.length > 0">
-        <v-data-table
-          :headers="headers"
-          :items="filteredMatches"
-          :items-per-page="itemsPerPage"
-          class="elevation-1"
-          :footer-props="{ 'items-per-page-text': $t('app.items_per_page') }"
-        >
-          <template #headers="{ columns }">
-            <tr>
-              <th v-for="column in columns" :key="column.key" :style="{ backgroundColor: thBg, color: thColor }">
-                {{ column.title }}
-              </th>
-            </tr>
-          </template>
-
-          <template #item="{ item, columns }">
-            <tr>
-              <td v-for="column in columns" :key="column.key" :style="{ color: thColor }">
-                <span v-if="column.key === 'utcDate'">{{ new Date(item.utcDate).toLocaleString() }}</span>
-                <span v-else-if="column.key === 'status'">
-                  <v-chip :color="getStatusColor(item.status)" small>
-                    {{ getStatusText(item.status) }}
-                  </v-chip>
-                </span>
-                <span v-else-if="column.key === 'competition'">
-                  {{ item.competition?.name || '-' }}
-                </span>
-                <span v-else-if="column.key === 'hometeam'">
-                  <b>{{ item.homeTeam?.name }}</b>
-                </span>
-                <span v-else-if="column.key === 'awayteam'">
-                  {{ item.awayTeam?.name }}
-                </span>
-                <span v-else-if="column.key === 'score'">
-                  {{ getScoreText(item) }}
-                </span>
-              </td>
-            </tr>
-          </template>
-        </v-data-table>
-      </div>
-
-      <!-- Mobile Card View -->
-      <div class="mobile-view" v-if="filteredMatches.length > 0">
-        <div class="matches-cards">
-        <v-card
-            v-for="match in filteredMatches"
-            :key="match.id"
-            class="match-card"
-            elevation="2"
+            size="large"
+            @click="$router.push('/leagues')"
           >
-            <v-card-text class="match-card-content">
-              <!-- Competition -->
-              <div class="match-competition">
-                <v-icon icon="mdi-trophy" size="16" class="competition-icon"></v-icon>
-                {{ match.competition?.name || '-' }}
-              </div>
-
-              <!-- Match Date -->
-              <div class="match-date">
-                <v-icon icon="mdi-calendar" size="16" class="date-icon"></v-icon>
-                {{ formatMatchDate(match.utcDate) }}
-              </div>
-
-              <!-- Match Status -->
-              <div class="match-status">
-                <v-chip 
-                  :color="getStatusColor(match.status)" 
-                  size="small"
-                  class="status-chip"
-                >
-                  {{ getStatusText(match.status) }}
-                </v-chip>
-              </div>
-
-              <!-- Teams and Score -->
-              <div class="match-teams">
-                <div class="team home-team">
-                  <div class="team-name" :style="{ color: thColor, fontWeight: 'bold' }">{{ match.homeTeam?.name }}</div>
-                  <div class="team-score" :style="{ color: thColor }">{{ getHomeScore(match) }}</div>
-                </div>
-                
-                <div class="vs-divider">
-                  <span>-</span>
-                </div>
-                
-                <div class="team away-team">
-                  <div class="team-name" :style="{ color: thColor, fontWeight: 'normal' }">{{ match.awayTeam?.name }}</div>
-                  <div class="team-score" :style="{ color: thColor }">{{ getAwayScore(match) }}</div>
-                </div>
-              </div>
-
-              <!-- Match Time (for scheduled matches) -->
-              <div v-if="match.status === 'SCHEDULED'" class="match-time">
-                <v-icon icon="mdi-clock" size="16" class="time-icon"></v-icon>
-                {{ formatMatchTime(match.utcDate) }}
-              </div>
-          </v-card-text>
-        </v-card>
+            Список лиг
+          </v-btn>
+          <v-btn
+            color="secondary"
+            size="large"
+            @click="$router.push('/teams')"
+          >
+            Список команд
+          </v-btn>
         </div>
       </div>
-    </template>
+    </section>
+
+    <!-- Фичи -->
+    <section class="features">
+      <h2>Мы предлагаем</h2>
+      <div class="features-grid">
+        <v-card
+          v-for="feature in features"
+          :key="feature.title"
+          class="feature-card"
+          @click="$router.push(feature.route)"
+        >
+          <v-card-text>
+            <!-- v-icon component designed to work with icon fonts (like Material Design Icons) -->
+            <v-icon
+              :icon="feature.icon"
+              size="48"
+              color="primary"
+              class="feature-icon"
+            ></v-icon>
+            <!-- v-img instead of v-icon component to use image files -->
+            <!-- <v-img
+              :src="feature.icon"
+              width="48"
+              height="48"
+              class="feature-icon mx-auto"
+            ></v-img>  -->
+            <h3>{{ feature.title }}</h3>
+            <p>{{ feature.description }}</p>
+          </v-card-text>
+        </v-card>
+      </div>
+    </section>
   </div>
 </template>
 
-<script>
-import api from '@/api'
-import { useTheme } from 'vuetify'
-import { computed } from 'vue'
-
+<script> // описываются действия, которые необходимо будет сделать для того, чтобы приложние работало
 export default {
   name: 'HomePage',
-  props: {
-    searchQuery: {
-      type: String,
-      default: ''
-    },
-    selectedDate: {
-      type: [String, Date],
-      default: null
-    },
-    selectedStatus: {
-      type: String,
-      default: 'all'
-    }
-  },
   data() {
     return {
-      matches: [],
-      isLoading: true,
-      error: null,
-      page: 1,
-      itemsPerPage: 10,
-    }
-  },
-  setup() {
-    const theme = useTheme()
-    const thBg = computed(() => theme.global.name.value === 'dark' ? '#2c3e50' : '#f8f9fa')
-    const thColor = computed(() => theme.global.name.value === 'dark' ? '#f8f9fa' : '#2c3e50')
-    return { thBg, thColor }
-  },
-  computed: {
-    filteredMatches() {
-      let filtered = this.matches;
-      
-      // Фильтрация по поисковому запросу
-      if (this.searchQuery) {
-        const query = this.searchQuery.toLowerCase();
-        filtered = filtered.filter(match => {
-          // Поиск по названию лиги/соревнования
-          const competitionMatch = match.competition?.name?.toLowerCase().includes(query);
-          
-          // Поиск по названию домашней команды
-          const homeTeamMatch = match.homeTeam?.name?.toLowerCase().includes(query);
-          
-          // Поиск по названию гостевой команды
-          const awayTeamMatch = match.awayTeam?.name?.toLowerCase().includes(query);
-          
-          // Поиск по короткому названию домашней команды (TLA)
-          const homeTeamTlaMatch = match.homeTeam?.tla?.toLowerCase().includes(query);
-          
-          // Поиск по короткому названию гостевой команды (TLA)
-          const awayTeamTlaMatch = match.awayTeam?.tla?.toLowerCase().includes(query);
-          
-          return competitionMatch || homeTeamMatch || awayTeamMatch || homeTeamTlaMatch || awayTeamTlaMatch;
-        });
-      }
-      
-      // Фильтрация по дате
-      if (this.selectedDate) {
-        let selectedDate;
-        if (this.selectedDate instanceof Date) {
-          selectedDate = this.selectedDate;
-        } else if (typeof this.selectedDate === 'string') {
-          selectedDate = new Date(this.selectedDate + 'T00:00:00');
+      features: [
+        {
+          icon: 'mdi-trophy',
+          //icon: 'free-icon-football-club-919408.png',
+          title: 'Лиги',
+          description: 'Ознакомиться с футбольными лигами',
+          route: '/leagues'
+        },
+        {
+          icon: 'mdi-account-group',
+          //icon: 'free-icon-soccer-player-919397.png',
+          title: 'Команды',
+          description: 'Просмотреть матчи и статистику команд',
+          route: '/teams'
         }
-        if (selectedDate) {
-          selectedDate.setHours(0, 0, 0, 0);
-          filtered = filtered.filter(match => {
-            const matchDate = new Date(match.utcDate);
-            matchDate.setHours(0, 0, 0, 0);
-            return matchDate.getTime() === selectedDate.getTime();
-          });
-        }
-      }
-      
-      // Фильтрация по статусу
-      if (this.selectedStatus && this.selectedStatus !== 'all') {
-        filtered = filtered.filter(match => match.status === this.selectedStatus);
-      }
-      
-      return filtered;
-    },
-    headers() {
-      return [
-        { key: 'utcDate', title: this.$t('app.table_date') },
-        { key: 'competition', title: this.$t('app.table_competition') },
-        { key: 'status', title: this.$t('app.table_status') },
-        { key: 'hometeam', title: this.$t('app.table_home') },
-        { key: 'awayteam', title: this.$t('app.table_away') },
-        { key: 'score', title: this.$t('app.table_score') },
-      ];
+      ]
     }
-  },
-  methods: {
-    async fetchData() {
-      this.isLoading = true
-      this.error = null
-      try {
-        // Получаем матчи из нескольких популярных лиг
-        const competitions = [
-          'PL', // Premier League
-          'PD', // La Liga
-          'SA', // Serie A
-          'BL1', // Bundesliga
-          'FL1', // Ligue 1
-          'CL', // Champions League
-          'EL', // Europa League
-        ]
-        const matchPromises = competitions.map(competition =>
-          api.get(`api/v4/competitions/${competition}/matches`).catch(err => {
-            console.warn(`Failed to fetch matches for competition ${competition}:`, err)
-            return { data: { matches: [] } }
-          })
-        )
-        const responses = await Promise.all(matchPromises)
-        const allMatches = responses.flatMap(response => response.data.matches || [])
-        // Сортируем по дате (новые сначала)
-        this.matches = allMatches.sort((a, b) => new Date(b.utcDate) - new Date(a.utcDate))
-      } catch (err) {
-        this.error = 'Не удалось загрузить матчи. Пожалуйста, попробуйте позже.'
-        console.error('Matches fetch error:', err)
-      } finally {
-        this.isLoading = false
-      }
-    },
-    getStatusText(status) {
-      const statusMap = {
-        SCHEDULED: this.$t('app.status_scheduled'),
-        LIVE: this.$t('app.status_live'),
-        IN_PLAY: this.$t('app.status_in_play'),
-        PAUSED: this.$t('app.status_paused'),
-        FINISHED: this.$t('app.status_finished'),
-        POSTPONED: this.$t('app.status_postponed'),
-        SUSPENDED: this.$t('app.status_suspended'),
-        CANCELLED: this.$t('app.status_cancelled'),
-        TIMED: this.$t('app.status_timed'),
-        ABANDONED: this.$t('app.status_abandoned'),
-        TECHNICAL_LOSS: this.$t('app.status_technical_loss'),
-      }
-      return statusMap[status] || status
-    },
-    getStatusColor(status) {
-      const statusMap = {        
-        SCHEDULED: 'primary',
-        LIVE: 'error',
-        IN_PLAY: 'error',
-        PAUSED: 'warning',
-        FINISHED: 'success',
-        POSTPONED: 'warning',        
-        SUSPENDED: 'info',
-        CANCELLED: 'warning',
-        TIMED: 'primary',        
-        ABANDONED: 'error',
-        TECHNICAL_LOSS: 'error'
-      }
-      return statusMap[status] || 'grey'
-    },
-    getScoreText(item) {
-      return item.score.fullTime.home !== null && item.score.fullTime.away !== null
-        ? `${item.score.fullTime.home} - ${item.score.fullTime.away}`
-        : '-'
-    },
-    getHomeScore(match) {
-      return match.score.fullTime.home !== null ? match.score.fullTime.home : '-'
-    },
-    getAwayScore(match) {
-      return match.score.fullTime.away !== null ? match.score.fullTime.away : '-'
-    },
-    formatMatchDate(dateString) {
-      const date = new Date(dateString)
-      return date.toLocaleDateString('ru-RU', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      })
-    },
-    formatMatchTime(dateString) {
-      const date = new Date(dateString)
-      return date.toLocaleTimeString('ru-RU', {
-        hour: '2-digit',
-        minute: '2-digit'
-      })
-    }
-  },
-  mounted() {
-    this.fetchData()
   }
 }
 </script>
 
-<style scoped>
-.matches-page {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem;
-  min-height: calc(100vh - 200px);
-  background: var(--v-theme-background);
-  color: var(--v-theme-text);
+<style scoped> /* прописываются параметры css */
+.home-page {
+  max-width: 1200px; /* максимальная ширина страницы */
+  margin: 0 auto; /* центрирование страницы по горизонтали */
+  padding: 1rem 1rem; /* добавление отступов вокруг содержимого */
+  background-color: var(--v-theme-background);
 }
 
-.page-header {
+.hero {
   text-align: center;
-  margin-bottom: 3rem;
-  position: relative;
-}
-
-.page-header::after {
-  content: '';
-  position: absolute;
-  bottom: -1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 4px;
-  background: linear-gradient(90deg, #3498db, #2c3e50);
-  border-radius: 2px;
-}
-
-.page-header h1 {
-  font-size: 2.8rem;
-  color: #2c3e50;
-  margin-bottom: 0.75rem;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-}
-
-.subtitle {
-  color: #7f8c8d;
-  font-size: 1.2rem;
-  font-weight: 500;
-}
-
-/* Desktop Table Styles */
-.desktop-view {
-  display: block;
+  padding: 3rem 1rem;
+  background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+  color: white;
+  border-radius: 12px;
   margin-bottom: 2rem;
-}
-
-.v-data-table {
-  background-color: var(--v-theme-surface);
-  border-radius: 12px;
-  overflow: hidden;
   box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
-  margin-top: 1.5rem;
 }
 
-.v-data-table :deep(th) {
-  font-weight: 600 !important;
-  font-size: 0.95rem !important;
-  text-transform: none !important;
-  letter-spacing: 0.3px !important;
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-.v-data-table :deep(td) {
-  font-size: 0.95rem !important;
-}
-
-.v-chip {
-  font-weight: 500;
-  letter-spacing: 0.3px;
-}
-
-/* Mobile Card Styles */
-.mobile-view {
-  display: none;
-}
-
-.matches-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-
-.match-card {
-  border-radius: 12px;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(44, 62, 80, 0.1);
-  background-color: var(--v-theme-surface);
-}
-
-.match-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(44, 62, 80, 0.15);
-}
-
-.match-card-content {
-  padding: 1.5rem;
-}
-
-.match-competition {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-  font-size: 0.9rem;
-  color: #3498db;
-  font-weight: 500;
-}
-
-.competition-icon {
-  color: #3498db;
-}
-
-.match-date {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #7f8c8d;
-  font-size: 0.9rem;
-  margin-bottom: 0.75rem;
-}
-
-.date-icon {
-  color: #3498db;
-}
-
-.match-status {
+.hero h1 {
+  font-size: 3rem;
   margin-bottom: 1rem;
-}
-
-.status-chip {
-  font-weight: 500;
-}
-
-.match-teams {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
-
-.team {
-  flex: 1;
-  text-align: center;
-}
-
-.home-team {
-  text-align: left;
-}
-
-.away-team {
-  text-align: right;
-}
-
-.team-name {
-  font-weight: 600;
-  color: #2c3e50;
-  font-size: 1rem;
-  margin-bottom: 0.25rem;
-  line-height: 1.3;
-}
-
-.team-score {
-  font-size: 1.5rem;
   font-weight: 700;
-  color: #3498db;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.vs-divider {
-  padding: 0 1rem;
-  color: #7f8c8d;
-  font-size: 2rem;
-  font-weight: 500;
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
 }
 
-.match-time {
+.hero-buttons {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #7f8c8d;
-  font-size: 0.9rem;
+  gap: 1rem;
   justify-content: center;
 }
 
-.time-icon {
+.features {
+  margin-bottom: 2rem;
+  padding: 2rem 0;
+}
+
+.features h2 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 1rem;
+}
+
+.feature-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  background: var(--v-theme-surface);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(44, 62, 80, 0.1);
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(44, 62, 80, 0.15);
+  border-color: #3498db;
+}
+
+.feature-icon {
+  margin-bottom: 1.5rem;
   color: #3498db;
 }
 
-.v-alert {
-  border-radius: 8px;
-  margin: 1rem 0;
+.feature-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: #2c3e50;
+  font-weight: 600;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .matches-page {
-    padding: 1.5rem 1rem;
-  }
+.feature-card p {
+  color: #7f8c8d;
+  line-height: 1.6;
+  padding: 0 1rem;
+}
 
-  .page-header h1 {
+.quick-access {
+  margin-bottom: 2rem;
+  padding: 2rem 0;
+  background-color: var(--v-theme-surface);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(44, 62, 80, 0.05);
+}
+
+.quick-access h2 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.quick-access-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.quick-access-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(44, 62, 80, 0.1);
+}
+
+.quick-access-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(44, 62, 80, 0.15);
+  border-color: #3498db;
+}
+
+.quick-access-card h3 {
+  font-size: 1.2rem;
+  margin: 1rem 0 0.5rem;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.quick-access-card p {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .hero h1 {
     font-size: 2rem;
   }
 
-  .subtitle {
-    font-size: 1.1rem;
+  .hero p {
+    font-size: 1rem;
   }
 
-  .desktop-view {
-    display: none;
+  .hero-buttons {
+    flex-direction: column; /* Stacks buttons vertically on mobile */
+    align-items: center; /* Centers buttons horizontally */
+    gap: 1rem;
   }
 
-  .mobile-view {
-    display: block;
+  .hero-buttons .v-btn {
+    width: 100%;
+    max-width: 280px;
   }
 
-  .match-card-content {
-    padding: 1rem;
+  .features-grid,
+  .quick-access-grid {
+    grid-template-columns: 1fr;
   }
+  
+  .feature-card,
+  .quick-access-card {
+    margin: 0 1rem;
+  }
+}
 
-  .team-name {
-    font-size: 0.9rem;
-  }
+/* Add custom style for turquoise button */
+.v-btn[color='turquose'] {
+  background: linear-gradient(90deg, #2ec4b6, #259ea6);
+  color: #fff !important;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.10);
+  border-radius: 8px;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.v-btn[color='turquose']:hover {
+  background: linear-gradient(90deg, #259ea6, #2ec4b6);
+  box-shadow: 0 4px 16px rgba(44, 62, 80, 0.18);
+}
 
-  .team-score {
-    font-size: 1.2rem;
-  }
+.v-btn[color='custom-turquoise'] {
+  background: linear-gradient(90deg, #2ec4b6 60%, #b0bec5 100%);
+  color: #fff !important;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.10);
+  border-radius: 8px;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.v-btn[color='custom-turquoise']:hover {
+  background: linear-gradient(90deg, #b0bec5 0%, #2ec4b6 100%);
+  box-shadow: 0 4px 16px rgba(44, 62, 80, 0.18);
 }
 </style>

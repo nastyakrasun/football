@@ -440,6 +440,6 @@ export default {
 
   .dialog-actions {
     padding: 8px 16px;
-  }
+}
 }
 </style> 

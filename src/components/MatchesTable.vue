@@ -94,14 +94,9 @@
             elevation="2"
           >
             <v-card-text class="match-card-content">
-              <!-- Match Date -->
-              <div class="match-date">
-                <v-icon icon="mdi-calendar" size="16" class="date-icon"></v-icon>
-                {{ formatMatchDate(match.utcDate) }}
-              </div>
-
-              <!-- Match Status -->
-              <div class="match-status">
+              <!-- Row 1: League/Competition Name and Status -->
+              <div class="match-row match-row-top">
+                <span class="competition-name">{{ match.competition?.name }}</span>
                 <v-chip 
                   :color="getStatusColor(match.status)" 
                   size="small"
@@ -111,27 +106,31 @@
                 </v-chip>
               </div>
 
-              <!-- Teams and Score -->
+              <!-- Row 2: Date and Time -->
+              <div class="match-row match-row-datetime">
+                <span class="match-date">
+                  <v-icon icon="mdi-calendar" size="16" class="date-icon"></v-icon>
+                  {{ formatMatchDate(match.utcDate) }}
+                </span>
+                <span class="match-time">
+                  <v-icon icon="mdi-clock" size="16" class="time-icon"></v-icon>
+                  {{ formatMatchTime(match.utcDate) }}
+                </span>
+              </div>
+
+              <!-- Row 3: Teams and Score -->
               <div class="match-teams">
                 <div class="team home-team">
                   <div class="team-name" :style="{ color: thColor, fontWeight: 'bold' }">{{ match.homeTeam?.name }}</div>
                   <div class="team-score" :style="{ color: thColor }">{{ getHomeScore(match) }}</div>
                 </div>
-                
                 <div class="vs-divider">
                   <span>-</span>
                 </div>
-                
                 <div class="team away-team">
                   <div class="team-name" :style="{ color: thColor, fontWeight: 'normal' }">{{ match.awayTeam?.name }}</div>
                   <div class="team-score" :style="{ color: thColor }">{{ getAwayScore(match) }}</div>
                 </div>
-              </div>
-
-              <!-- Match Time (for scheduled matches) -->
-              <div v-if="match.status === 'SCHEDULED'" class="match-time">
-                <v-icon icon="mdi-clock" size="16" class="time-icon"></v-icon>
-                {{ formatMatchTime(match.utcDate) }}
               </div>
             </v-card-text>
           </v-card>
@@ -587,6 +586,42 @@ export default {
 
   .vs-divider {
     padding: 0 0.5rem;
+  }
+}
+
+/* Add styles for new match card layout */
+.competition-name {
+  font-weight: 700;
+  color: #3498db;
+  font-size: 1.05rem;
+  margin-right: 0.5rem;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.match-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+.match-row-top {
+  margin-bottom: 0.75rem;
+}
+.match-row-datetime {
+  font-size: 0.92rem;
+  color: #7f8c8d;
+  gap: 1.5rem;
+}
+@media (max-width: 768px) {
+  .competition-name {
+    font-size: 0.98rem;
+  }
+  .match-row-datetime {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
   }
 }
 </style> 
