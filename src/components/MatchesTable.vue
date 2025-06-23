@@ -34,12 +34,6 @@
 
     <!-- Таблица матчей -->
     <template v-else>
-      <!-- подключение компонента Календарь -->
-      <DatePicker 
-        v-model="dateFrom"
-        @date-change="onDateChange"
-      />
-
       <!-- No matches for selected date (both desktop and mobile) -->
       <v-alert
         v-if="filteredMatches.length === 0"
@@ -71,18 +65,18 @@
               <td v-for="column in columns" :key="column.key" :style="{ color: thColor }">
                 <span v-if="column.key === 'utcDate'">{{ new Date(item.utcDate).toLocaleString() }}</span>
                 <span v-else-if="column.key === 'status'">
-                  <v-chip :color="getStatusColor(item.status)" small>
-                    {{ getStatusText(item.status) }}
-                  </v-chip>
+            <v-chip :color="getStatusColor(item.status)" small>
+              {{ getStatusText(item.status) }}
+            </v-chip>
                 </span>
                 <span v-else-if="column.key === 'hometeam'">
-                  <b>{{ item.homeTeam?.name }}</b>
+            <b>{{ item.homeTeam?.name }}</b>
                 </span>
                 <span v-else-if="column.key === 'awayteam'">
-                  {{ item.awayTeam?.name }}
+            {{ item.awayTeam?.name }}
                 </span>
                 <span v-else-if="column.key === 'score'">
-                  {{ getScoreText(item) }}
+            {{ getScoreText(item) }}
                 </span>
               </td>
             </tr>
@@ -149,15 +143,11 @@
 
 <script>
 import api from '@/api'
-import DatePicker from '@/components/DatePicker.vue'
 import { useTheme } from 'vuetify'
 import { computed } from 'vue'
 
 export default {
   name: 'MatchesTable',
-  components: {
-    DatePicker
-  },
   props: {
     entityType: {
       type: String,
@@ -171,6 +161,14 @@ export default {
     searchQuery: {
       type: String,
       default: ''
+    },
+    selectedDate: {
+      type: [String, Date],
+      default: null
+    },
+    selectedStatus: {
+      type: String,
+      default: 'all'
     }
   },
   data() {
@@ -181,7 +179,6 @@ export default {
       error: null,
       page: 1,
       itemsPerPage: 10,
-      dateFrom: null,
     }
   },
   setup() {
@@ -192,27 +189,29 @@ export default {
   },
   computed: {
     filteredMatches() {
-      if (!this.dateFrom) return this.matches;
-      
-      // конвертируем dateFrom в единый формат для сравнения
+      let filtered = this.matches;
+      // Фильтрация по дате
+      if (this.selectedDate) {
       let selectedDate;
-      if (this.dateFrom instanceof Date) {
-        selectedDate = this.dateFrom;
-      } else if (typeof this.dateFrom === 'string') {
-        // парсим строку даты и приводим к полуночи для предотвращения расхождения часовых поясов
-        selectedDate = new Date(this.dateFrom + 'T00:00:00');
-      } else {
-        return this.matches;
-      }
-      
-      // приводим к полуночи для точного сравнения дат
+        if (this.selectedDate instanceof Date) {
+          selectedDate = this.selectedDate;
+        } else if (typeof this.selectedDate === 'string') {
+          selectedDate = new Date(this.selectedDate + 'T00:00:00');
+        }
+        if (selectedDate) {
       selectedDate.setHours(0, 0, 0, 0);
-      
-      return this.matches.filter(match => {
+          filtered = filtered.filter(match => {
         const matchDate = new Date(match.utcDate);
         matchDate.setHours(0, 0, 0, 0);
         return matchDate.getTime() === selectedDate.getTime();
       });
+        }
+      }
+      // Фильтрация по статусу
+      if (this.selectedStatus && this.selectedStatus !== 'all') {
+        filtered = filtered.filter(match => match.status === this.selectedStatus);
+      }
+      return filtered;
     },
     totalPages() {
       return Math.ceil(this.matches.length / this.itemsPerPage)
@@ -287,7 +286,7 @@ export default {
         FINISHED: 'success',
         POSTPONED: 'warning',        
         SUSPENDED: 'info',
-        CANCELLED: 'warning',
+        CANCELLED: 'warning',        
         TIMED: 'primary',        
         ABANDONED: 'error',
         TECHNICAL_LOSS: 'error'
@@ -336,9 +335,6 @@ export default {
     },
     onSearchInput() {
       this.page = 1
-    },
-    onDateChange() {
-      this.page = 1; // Reset to first page when date changes
     }
   },
   mounted() {

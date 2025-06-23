@@ -3,12 +3,17 @@
   <div class="app-container">
     <AppHeader
       @search="onSearch"
+      :selected-date="selectedDate"
+      @update:selected-date="selectedDate = $event"
+      @date-change="onDateChange"
+      :selected-status="selectedStatus"
+      @update:selected-status="selectedStatus = $event"
     />
 
     <!-- Основное содержание -->
     <main class="main-content">
       <!-- router-view - этот роутер говорит о том, из каких элементов состоит наше приложение -->
-      <router-view :searchQuery="searchQuery" />
+      <router-view :searchQuery="searchQuery" :selectedDate="selectedDate" :selectedStatus="selectedStatus" />
     </main>
 
     <AppFooter/>
@@ -28,11 +33,17 @@ export default {
   data() {
     return {
       searchQuery: "",
+      selectedDate: null,
+      selectedStatus: 'all',
     };
   },
   methods: {
     onSearch(query) {
       this.searchQuery = query;
+    },
+    onDateChange() {
+      // Передаем изменение даты в роутер
+      this.$forceUpdate();
     }
   }
 };

@@ -3,6 +3,8 @@
     entity-type="league"
     :entity-id="$route.params.id"
     :search-query="searchQuery"
+    :selected-date="selectedDate"
+    :selected-status="selectedStatus"
   />
 </template>
 
@@ -18,6 +20,14 @@ export default {
     searchQuery: {
       type: String,
       default: ''
+    },
+    selectedDate: {
+      type: [String, Date],
+      default: null
+    },
+    selectedStatus: {
+      type: String,
+      default: 'all'
     }
   }
 }

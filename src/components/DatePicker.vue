@@ -1,43 +1,87 @@
 <template>
-  <v-card class="mb-4">
-    <v-card-text>
-      <v-row align="center">
-        <v-col cols="12" md="4">
+  <div class="calendar-button-container">
+    <!-- Кнопка календаря -->
+    <v-btn
+      @click="showDialog = true"
+      variant="outlined"
+      class="calendar-btn"
+      color="#3498db"
+    >
+      <v-icon class="calendar-icon">mdi-calendar</v-icon>
+      <span class="date-text">{{ formattedShortDate }}</span>
+      <v-icon class="arrow-icon">mdi-chevron-right</v-icon>
+    </v-btn>
+
+    <!-- Модальное окно с календарем -->
+    <v-dialog
+      v-model="showDialog"
+      max-width="380"
+      :fullscreen="$vuetify.display.smAndDown"
+      persistent
+    >
+      <v-card class="calendar-dialog">
+        <v-card-title class="dialog-title">
+          {{ $t('app.calendar') }}
+          <v-btn
+            icon
+            @click="showDialog = false"
+            class="close-btn"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+        
+        <v-card-text class="dialog-content">
           <v-date-picker
             v-model="selectedDate"
             @update:model-value="onDateChange"
             color="primary"
             elevation="2"
-            class="rounded-lg"
-            :title="$t('app.title')"
-            :header="$t('app.selectedDate')"
+            class="calendar-picker"
           />
-        </v-col>
-        <v-col cols="12" md="7">
+          
+          <div class="selected-date-display">
           <v-text-field 
-            v-model="formattedDate" 
-            :label="$t('app.selectedDate')"
+              v-model="selectedDateDisplay" 
+              :label="$t('app.selectedDate')"
             readonly
             variant="outlined"
-            density="comfortable"
-            class="mt-4"
+              density="compact"
+              class="mt-3"
           />
+          </div>
+        </v-card-text>
+        
+        <v-card-actions class="dialog-actions">
           <v-btn
             @click="clearFilter"
             color="primary"
             variant="outlined"
-            class="mt-4"
-            block
+            class="clear-btn"
+            size="small"
           >
-            {{$t('app.clear')}}
+            {{ $t('app.clear') }}
           </v-btn>
-        </v-col>
-      </v-row>
-    </v-card-text>
+          <v-spacer></v-spacer>
+          <v-btn
+            @click="showDialog = false"
+            color="primary"
+            variant="elevated"
+            size="small"
+          >
+            {{ $t('app.ok') }}
+          </v-btn>
+        </v-card-actions>
   </v-card>
+    </v-dialog>
+  </div>
 </template>
 
 <script>
+import { useTheme } from 'vuetify'
+import { useI18n } from 'vue-i18n'
+import { ref, computed } from 'vue'
+
 export default {
   name: 'DatePicker',
   props: {
@@ -47,27 +91,24 @@ export default {
     }
   },
   emits: ['update:modelValue', 'date-change'],
-  computed: {
-    selectedDate: {
+  setup(props, { emit }) {
+    const theme = useTheme()
+    const { t } = useI18n()
+    const showDialog = ref(false)
+    const selectedDate = computed({
       get() {
-        if (!this.modelValue) return null;
-        
-        // если получена строка в формате YYYY-MM-DD
-        if (typeof this.modelValue === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(this.modelValue)) {
-          return this.modelValue;
+        if (!props.modelValue) return null;
+        if (typeof props.modelValue === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(props.modelValue)) {
+          return props.modelValue;
         }
-        
-        // конвертируем дату в формат YYYY-MM-DD
-        if (this.modelValue instanceof Date) {
-          const year = this.modelValue.getFullYear();
-          const month = String(this.modelValue.getMonth() + 1).padStart(2, '0');
-          const day = String(this.modelValue.getDate()).padStart(2, '0');
+        if (props.modelValue instanceof Date) {
+          const year = props.modelValue.getFullYear();
+          const month = String(props.modelValue.getMonth() + 1).padStart(2, '0');
+          const day = String(props.modelValue.getDate()).padStart(2, '0');
           return `${year}-${month}-${day}`;
         }
-        
-        // парсим строку, полученную в формате отличном от YYYY-MM-DD
-        if (typeof this.modelValue === 'string') {
-          const date = new Date(this.modelValue);
+        if (typeof props.modelValue === 'string') {
+          const date = new Date(props.modelValue);
           if (!isNaN(date.getTime())) {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -75,12 +116,45 @@ export default {
             return `${year}-${month}-${day}`;
           }
         }
-        
         return null;
       },
       set(value) {
-        // выбранное значение получено из календаря
-        this.$emit('update:modelValue', value);
+        emit('update:modelValue', value)
+      }
+    })
+    const formattedShortDate = computed(() => {
+      if (!selectedDate.value) return t('app.selectDate')
+      try {
+        const date = new Date(selectedDate.value + 'T00:00:00')
+        const day = String(date.getDate()).padStart(2, '0')
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const year = String(date.getFullYear()).slice(-2)
+        return `${day}/${month}/${year}`
+      } catch (error) {
+        return t('app.selectDate')
+      }
+    })
+    return { theme, t, showDialog, selectedDate, formattedShortDate }
+  },
+  data() {
+    return {
+      selectedDateDisplay: ''
+    }
+  },
+  computed: {
+    selectedDateDisplay() {
+      if (!this.selectedDate) return '';
+      
+      try {
+        const date = new Date(this.selectedDate + 'T00:00:00');
+        return date.toLocaleDateString('ru-RU', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      } catch (error) {
+        console.error('Error formatting date display:', error);
+        return this.selectedDate;
       }
     },
     formattedDate() {
@@ -113,158 +187,259 @@ export default {
 </script>
 
 <style scoped>
-.v-date-picker {
-  background: var(--v-theme-surface);
+.calendar-button-container {
+  /* Убираем фиксированное позиционирование */
+}
+
+.calendar-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
   border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
-  border: 2px solid rgba(44, 62, 80, 0.18);
+  font-weight: 500;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.1);
+  background: var(--v-theme-surface);
+  border: 2px solid rgba(44, 62, 80, 0.18);
 }
 
 @media (prefers-color-scheme: dark) {
-  .v-date-picker {
+  .calendar-btn {
     border: 2px solid rgba(200, 220, 255, 0.22);
   }
 }
 
-.v-date-picker:hover {
-  box-shadow: 0 6px 20px rgba(44, 62, 80, 0.15);
+.calendar-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(44, 62, 80, 0.15);
 }
 
-.v-date-picker :deep(.v-date-picker-header) {
-  padding: 16px;
-  background-color: #f8f9fa;
-  border-bottom: 1px solid rgba(44, 62, 80, 0.05);
+.calendar-icon {
+  font-size: 20px;
+  color: #3498db;
 }
 
-.v-date-picker :deep(.v-date-picker-header__title) {
+.date-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--v-theme-on-surface);
+  min-width: 60px;
+  text-align: center;
+}
+
+.arrow-icon {
+  font-size: 16px;
+  color: #3498db;
+  transition: transform 0.3s ease;
+}
+
+.calendar-btn:hover .arrow-icon {
+  transform: translateX(2px);
+}
+
+.calendar-dialog {
+  border-radius: 16px;
+  overflow: hidden;
+  max-height: 90vh;
+}
+
+.dialog-title {
+  background: var(--v-theme-surface);
+  color: var(--v-theme-on-surface);
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(44, 62, 80, 0.1);
   font-size: 1.1rem;
-  font-weight: 600;
-  color: #2c3e50;
 }
 
-.v-date-picker :deep(.v-date-picker-table) {
-  padding: 8px;
+.close-btn {
+  color: var(--v-theme-on-surface);
 }
 
-.v-date-picker :deep(.v-date-picker-table__current) {
-  color: #3498db;
-  font-weight: 600;
+.dialog-content {
+  padding: 16px 20px;
+  background: var(--v-theme-surface);
+  max-height: calc(90vh - 120px);
+  overflow-y: auto;
 }
 
-.v-date-picker :deep(.v-date-picker-table__day) {
+.calendar-picker {
+  background: var(--v-theme-surface);
   border-radius: 8px;
-  transition: all 0.2s ease;
-}
-
-.v-date-picker :deep(.v-date-picker-table__day:hover) {
-  background-color: rgba(52, 152, 219, 0.1);
-}
-
-.v-date-picker :deep(.v-date-picker-table__day--selected) {
-  background-color: #3498db !important;
-  color: white !important;
-}
-
-.v-date-picker :deep(.v-date-picker-table__day--selected:hover) {
-  background-color: #2980b9 !important;
-}
-
-.v-date-picker :deep(.v-date-picker-table__day--disabled) {
-  color: #bdc3c7 !important;
-}
-
-.v-date-picker :deep(.v-date-picker-table__day--adjacent-month) {
-  color: #95a5a6;
-}
-
-.v-date-picker :deep(.v-date-picker-table__weekday) {
-  color: #7f8c8d;
-  font-weight: 500;
-  font-size: 0.9rem;
-}
-
-.v-date-picker :deep(.v-date-picker-table__month) {
-  color: #2c3e50;
-  font-weight: 500;
-}
-
-.v-date-picker :deep(.v-date-picker-table__month--selected) {
-  background-color: #3498db !important;
-  color: white !important;
-}
-
-.v-date-picker :deep(.v-date-picker-table__month:hover) {
-  background-color: rgba(52, 152, 219, 0.1);
-}
-
-.v-date-picker :deep(.v-date-picker-table__year) {
-  color: #2c3e50;
-  font-weight: 500;
-}
-
-.v-date-picker :deep(.v-date-picker-table__year--selected) {
-  background-color: #3498db !important;
-  color: white !important;
-}
-
-.v-date-picker :deep(.v-date-picker-table__year:hover) {
-  background-color: rgba(52, 152, 219, 0.1);
-}
-
-.v-date-picker :deep(.v-date-picker-table__header) {
-  padding: 8px;
-  background-color: #f8f9fa;
-}
-
-.v-date-picker :deep(.v-date-picker-table__header-title) {
-  font-weight: 600;
-  color: #2c3e50;
-}
-
-.v-date-picker :deep(.v-date-picker-table__header-arrow) {
-  color: #3498db;
-}
-
-.v-date-picker :deep(.v-date-picker-table__header-arrow:hover) {
-  background-color: rgba(52, 152, 219, 0.1);
-}
-
-.v-date-picker :deep(.v-date-picker-table__header-arrow--disabled) {
-  color: #bdc3c7;
-}
-
-.v-date-picker :deep(.v-date-picker-table__header-arrow--disabled:hover) {
-  background-color: transparent;
-}
-
-.v-text-field {
-  margin-bottom: 1rem;
-}
-
-.v-text-field :deep(.v-field) {
-  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.1);
+  border: 1px solid rgba(44, 62, 80, 0.1);
   transition: all 0.3s ease;
 }
 
-/* Responsive styles for DatePicker */
+@media (prefers-color-scheme: dark) {
+  .calendar-picker {
+    border: 1px solid rgba(200, 220, 255, 0.15);
+  }
+}
+
+.calendar-picker:hover {
+  box-shadow: 0 4px 12px rgba(44, 62, 80, 0.15);
+}
+
+.calendar-picker :deep(.v-date-picker-header) {
+  padding: 12px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid rgba(44, 62, 80, 0.05);
+  display: none; /* Скрываем весь блок заголовка */
+}
+
+.calendar-picker :deep(.v-date-picker-header__title) {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  display: none; /* Скрываем заголовок календаря */
+}
+
+.calendar-picker :deep(.v-date-picker-table) {
+  padding: 6px;
+}
+
+.calendar-picker :deep(.v-date-picker-table__current) {
+  color: #3498db;
+  font-weight: 600;
+}
+
+.calendar-picker :deep(.v-date-picker-table__day) {
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.calendar-picker :deep(.v-date-picker-table__day:hover) {
+  background-color: rgba(52, 152, 219, 0.1);
+}
+
+.calendar-picker :deep(.v-date-picker-table__day--selected) {
+  background-color: #3498db !important;
+  color: white !important;
+}
+
+.calendar-picker :deep(.v-date-picker-table__day--selected:hover) {
+  background-color: #2980b9 !important;
+}
+
+.calendar-picker :deep(.v-date-picker-table__day--disabled) {
+  color: #bdc3c7 !important;
+}
+
+.calendar-picker :deep(.v-date-picker-table__day--adjacent-month) {
+  color: #95a5a6;
+}
+
+.calendar-picker :deep(.v-date-picker-table__weekday) {
+  color: #7f8c8d;
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+
+.calendar-picker :deep(.v-date-picker-table__month) {
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.calendar-picker :deep(.v-date-picker-table__month--selected) {
+  background-color: #3498db !important;
+  color: white !important;
+}
+
+.calendar-picker :deep(.v-date-picker-table__month:hover) {
+  background-color: rgba(52, 152, 219, 0.1);
+}
+
+.selected-date-display {
+  margin-top: 12px;
+}
+
+.dialog-actions {
+  padding: 12px 20px;
+  background: var(--v-theme-surface);
+  border-top: 1px solid rgba(44, 62, 80, 0.1);
+}
+
+.clear-btn {
+  margin-right: 8px;
+}
+
 @media (max-width: 768px) {
-  .v-card.mb-4 {
-    padding: 0.5rem 0.25rem;
+  .calendar-btn {
+    padding: 10px 12px;
+    gap: 6px;
   }
-  .v-card-text {
-    padding: 0.5rem 0.25rem;
+  
+  .date-text {
+    font-size: 12px;
+    min-width: 50px;
   }
-  .v-date-picker {
-    font-size: 0.95rem;
-    min-width: 100%;
+  
+  .calendar-icon {
+    font-size: 18px;
   }
-  .v-text-field {
-    margin-top: 1rem !important;
-    margin-bottom: 0.5rem !important;
+  
+  .arrow-icon {
+    font-size: 14px;
   }
-  .v-btn.mt-4 {
-    margin-top: 0.5rem !important;
+
+  .calendar-dialog {
+    border-radius: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    max-height: 100vh;
+}
+
+  .dialog-title {
+    padding: 12px 16px;
+    font-size: 1rem;
+  }
+
+  .dialog-content {
+    padding: 12px 16px;
+    flex: 1;
+    overflow-y: auto;
+    max-height: none;
+  }
+
+  .calendar-picker {
+    border-radius: 6px;
+    border: 1px solid rgba(44, 62, 80, 0.1);
+}
+
+  .calendar-picker :deep(.v-date-picker-header) {
+  padding: 8px;
+}
+
+  .calendar-picker :deep(.v-date-picker-header__title) {
+    font-size: 0.9rem;
+}
+
+  .calendar-picker :deep(.v-date-picker-table) {
+    padding: 4px;
+}
+
+  .calendar-picker :deep(.v-date-picker-table__day) {
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+  .calendar-picker :deep(.v-date-picker-table__weekday) {
+    font-size: 0.7rem;
+}
+
+  .selected-date-display {
+    margin-top: 8px;
+}
+
+  .dialog-actions {
+    padding: 8px 16px;
   }
 }
 </style> 
