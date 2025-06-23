@@ -13,7 +13,7 @@ const messages = {
   en: {
     app: {
       title: "SoccerStat",
-      home: "Home",
+      home: "Matches",
       leagues: "Leagues",
       teams: "Teams",
       search: "Search...",
@@ -78,12 +78,16 @@ const messages = {
       calendar: "Calendar",
       dateSelection: "Date Selection",
       selectedDate: "Selected Date",
+      settings: "Settings",
+      language_ru: "Russian",
+      language_en: "English",
+      theme_light: "Light",
     },
   },
   ru: {
     app: {
       title: "SoccerStat",
-      home: "Главная",
+      home: "Матчи",
       leagues: "Лиги",
       teams: "Команды",
       search: "Поиск...",

@@ -16,7 +16,7 @@
       <router-view :searchQuery="searchQuery" :selectedDate="selectedDate" :selectedStatus="selectedStatus" />
     </main>
 
-    <AppFooter/>
+    <AppFooter />
   </div>
 </template>
 
