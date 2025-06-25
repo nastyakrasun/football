@@ -82,60 +82,21 @@
       <!-- Mobile Card View -->
       <div class="mobile-view" v-if="filteredMatches.length > 0">
         <div class="matches-cards">
-        <v-card
+          <MatchCard
             v-for="match in filteredMatches"
             :key="match.id"
-            class="match-card"
-            elevation="2"
-          >
-            <v-card-text class="match-card-content">
-              <!-- Competition -->
-              <div class="match-competition">
-                <v-icon icon="mdi-trophy" size="16" class="competition-icon"></v-icon>
-                {{ match.competition?.name || '-' }}
-              </div>
-
-              <!-- Match Date -->
-              <div class="match-date">
-                <v-icon icon="mdi-calendar" size="16" class="date-icon"></v-icon>
-                {{ formatMatchDate(match.utcDate) }}
-              </div>
-
-              <!-- Match Status -->
-              <div class="match-status">
-                <v-chip 
-                  :color="getStatusColor(match.status)" 
-                  size="small"
-                  class="status-chip"
-                >
-                  {{ getStatusText(match.status) }}
-                </v-chip>
-              </div>
-
-              <!-- Teams and Score -->
-              <div class="match-teams">
-                <div class="team home-team">
-                  <div class="team-name" :style="{ color: thColor, fontWeight: 'bold' }">{{ match.homeTeam?.name }}</div>
-                  <div class="team-score" :style="{ color: thColor }">{{ getHomeScore(match) }}</div>
-                </div>
-                
-                <div class="vs-divider">
-                  <span>:</span>
-                </div>
-                
-                <div class="team away-team">
-                  <div class="team-name" :style="{ color: thColor, fontWeight: 'normal' }">{{ match.awayTeam?.name }}</div>
-                  <div class="team-score" :style="{ color: thColor }">{{ getAwayScore(match) }}</div>
-                </div>
-              </div>
-
-              <!-- Match Time (for scheduled matches) -->
-              <div v-if="match.status === 'SCHEDULED'" class="match-time">
-                <v-icon icon="mdi-clock" size="16" class="time-icon"></v-icon>
-                {{ formatMatchTime(match.utcDate) }}
-              </div>
-          </v-card-text>
-        </v-card>
+            :competitionName="match.competition?.name || '-'"
+            :matchDate="formatMatchDate(match.utcDate)"
+            :statusColor="getStatusColor(match.status)"
+            :statusText="getStatusText(match.status)"
+            :homeTeamName="match.homeTeam?.name"
+            :homeScore="getHomeScore(match)"
+            :awayTeamName="match.awayTeam?.name"
+            :awayScore="getAwayScore(match)"
+            :thColor="thColor"
+            :isScheduled="match.status === 'SCHEDULED'"
+            :matchTime="formatMatchTime(match.utcDate)"
+          />
         </div>
       </div>
     </template>
@@ -146,6 +107,7 @@
 import api from '@/api'
 import { useTheme } from 'vuetify'
 import { computed } from 'vue'
+import MatchCard from '@/components/MatchCard.vue'
 
 export default {
   name: 'HomePage',
@@ -332,6 +294,9 @@ export default {
       })
     }
   },
+  components: {
+    MatchCard,
+  },
   mounted() {
     this.fetchData()
   }
@@ -422,111 +387,6 @@ export default {
   margin-top: 1.5rem;
 }
 
-.match-card {
-  border-radius: 12px;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(44, 62, 80, 0.1);
-  background-color: var(--v-theme-surface);
-}
-
-.match-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(44, 62, 80, 0.15);
-}
-
-.match-card-content {
-  padding: 1.5rem;
-}
-
-.match-competition {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-  font-size: 0.9rem;
-  color: #3498db;
-  font-weight: 500;
-}
-
-.competition-icon {
-  color: #3498db;
-}
-
-.match-date {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #7f8c8d;
-  font-size: 0.9rem;
-  margin-bottom: 0.75rem;
-}
-
-.date-icon {
-  color: #3498db;
-}
-
-.match-status {
-  margin-bottom: 1rem;
-}
-
-.status-chip {
-  font-weight: 500;
-}
-
-.match-teams {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
-
-.team {
-  flex: 1;
-  text-align: center;
-}
-
-.home-team {
-  text-align: left;
-}
-
-.away-team {
-  text-align: right;
-}
-
-.team-name {
-  font-weight: 600;
-  color: #2c3e50;
-  font-size: 1rem;
-  margin-bottom: 0.25rem;
-  line-height: 1.3;
-}
-
-.team-score {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #3498db;
-}
-
-.vs-divider {
-  padding: 0 1rem;
-  color: #7f8c8d;
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-.match-time {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #7f8c8d;
-  font-size: 0.9rem;
-  justify-content: center;
-}
-
-.time-icon {
-  color: #3498db;
-}
-
 .v-alert {
   border-radius: 8px;
   margin: 1rem 0;
@@ -550,15 +410,6 @@ export default {
   }
   .mobile-view {
     display: block;
-  }
-  .match-card-content {
-    padding: 1rem;
-  }
-  .team-name {
-    font-size: 0.9rem;
-  }
-  .team-score {
-    font-size: 1.2rem;
   }
 }
 </style>

@@ -87,53 +87,21 @@
       <!-- Mobile Card View -->
       <div class="mobile-view" v-if="filteredMatches.length > 0">
         <div class="matches-cards">
-          <v-card
+          <MatchCard
             v-for="match in filteredMatches"
             :key="match.id"
-            class="match-card"
-            elevation="2"
-          >
-            <v-card-text class="match-card-content">
-              <!-- Row 1: League/Competition Name and Status -->
-              <div class="match-row match-row-top">
-                <span class="competition-name">{{ match.competition?.name }}</span>
-                <v-chip 
-                  :color="getStatusColor(match.status)" 
-                  size="small"
-                  class="status-chip"
-                >
-                  {{ getStatusText(match.status) }}
-                </v-chip>
-              </div>
-
-              <!-- Row 2: Date and Time -->
-              <div class="match-row match-row-datetime">
-                <span class="match-date">
-                  <v-icon icon="mdi-calendar" size="16" class="date-icon"></v-icon>
-                  {{ formatMatchDate(match.utcDate) }}
-                </span>
-                <span class="match-time">
-                  <v-icon icon="mdi-clock" size="16" class="time-icon"></v-icon>
-                  {{ formatMatchTime(match.utcDate) }}
-                </span>
-              </div>
-
-              <!-- Row 3: Teams and Score -->
-              <div class="match-teams">
-                <div class="team home-team">
-                  <div class="team-name" :style="{ color: thColor, fontWeight: 'bold' }">{{ match.homeTeam?.name }}</div>
-                  <div class="team-score" :style="{ color: thColor }">{{ getHomeScore(match) }}</div>
-                </div>
-                <div class="vs-divider">
-                  <span>-</span>
-                </div>
-                <div class="team away-team">
-                  <div class="team-name" :style="{ color: thColor, fontWeight: 'normal' }">{{ match.awayTeam?.name }}</div>
-                  <div class="team-score" :style="{ color: thColor }">{{ getAwayScore(match) }}</div>
-                </div>
-              </div>
-            </v-card-text>
-          </v-card>
+            :competitionName="match.competition?.name || entity.name || '-'"
+            :matchDate="formatMatchDate(match.utcDate)"
+            :statusColor="getStatusColor(match.status)"
+            :statusText="getStatusText(match.status)"
+            :homeTeamName="match.homeTeam?.name"
+            :homeScore="getHomeScore(match)"
+            :awayTeamName="match.awayTeam?.name"
+            :awayScore="getAwayScore(match)"
+            :thColor="thColor"
+            :isScheduled="match.status === 'SCHEDULED'"
+            :matchTime="formatMatchTime(match.utcDate)"
+          />
         </div>
       </div>
     </template>
@@ -144,6 +112,7 @@
 import api from '@/api'
 import { useTheme } from 'vuetify'
 import { computed } from 'vue'
+import MatchCard from '@/components/MatchCard.vue'
 
 export default {
   name: 'MatchesTable',
@@ -343,7 +312,10 @@ export default {
     entityId() {
       this.fetchData()
     }
-  }
+  },
+  components: {
+    MatchCard,
+  },
 }
 </script>
 

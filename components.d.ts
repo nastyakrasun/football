@@ -13,6 +13,7 @@ declare module 'vue' {
     Card: typeof import('./src/components/Card.vue')['default']
     DatePicker: typeof import('./src/components/DatePicker.vue')['default']
     LanguageChange: typeof import('./src/components/LanguageChange.vue')['default']
+    MatchCard: typeof import('./src/components/MatchCard.vue')['default']
     MatchesList: typeof import('./src/components/MatchesList.vue')['default']
     MatchesTable: typeof import('./src/components/MatchesTable.vue')['default']
     Pagination: typeof import('./src/components/Pagination.vue')['default']
