@@ -371,17 +371,20 @@ export default {
 
 @media (max-width: 768px) {
   .calendar-btn {
-    padding: 10px 12px;
-    gap: 6px;
+    padding: 2px 4px;
+    margin-left: 0px;
+    margin-top: 6px;
+    /*gap: 4px; */   
   }
   
   .date-text {
-    font-size: 12px;
-    min-width: 50px;
+    font-size: 10px;
+    min-width: 30px;    
   }
   
   .calendar-icon {
     font-size: 18px;
+    display: none;
   }
   
   .arrow-icon {

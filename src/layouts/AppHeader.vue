@@ -162,6 +162,7 @@ export default {
   align-items: center;
   background: var(--v-theme-surface);
   border-bottom: 1px solid rgba(44, 62, 80, 0.1);
+  justify-content: center;
 }
 
 .brand-section {
@@ -250,6 +251,7 @@ export default {
 
 .status-btn {
   min-width: 100px;
+  width: 180px;
   height: 40px;
   font-weight: 500;
   text-transform: none;
@@ -314,9 +316,10 @@ export default {
   }
 
   .header-second-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
   }
 
   .main-nav {
@@ -345,13 +348,12 @@ export default {
   }
 
   .status-btn {
-    min-width: 48px;
-    width: 48px;
-    height: 48px;
+    min-width: 40px;
+    width: 40px;
+    height: 40px;
     font-size: 11px;
     flex-shrink: 0;
     border-radius: 50%;
-    padding: 0;
   }
 
   .desktop-only {
