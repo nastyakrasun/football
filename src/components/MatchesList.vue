@@ -298,7 +298,7 @@ export default {
 .league-name {
   font-size: 1.3rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: #3498db;
   padding: 1rem 1rem 0.5rem;
   line-height: 1.4;
 }
@@ -343,7 +343,7 @@ export default {
 .team-name {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: #3498db;
   padding: 1rem;
   line-height: 1.4;
   text-align: center;

@@ -7,7 +7,6 @@
           <h3>{{$t('app.about')}}</h3>
           <p>{{$t('app.about_desc')}}</p>
         </div>
-
         <!-- Секция перехода -->
         <div class="footer-section">
           <h3>{{$t('app.go_to')}}</h3>
@@ -16,7 +15,6 @@
             <li><router-link to="/teams">{{$t('app.teams')}}</router-link></li>
           </ul>
         </div>
-
         <!-- Секция обратной связи -->
         <div class="footer-section">
           <h3>{{$t('app.contacts')}}</h3>
@@ -40,7 +38,6 @@
           </div>
         </div>
       </div>
-
       <!-- Авторское право -->
       <div class="footer-bottom">
         <p>&copy; {{ new Date().getFullYear() }} SoccerStat. {{$t('app.copyright')}}</p>
@@ -166,4 +163,4 @@ export default {
     padding: 0 1rem;
   }
 }
-</style>
+</style> 

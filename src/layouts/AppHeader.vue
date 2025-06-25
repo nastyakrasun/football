@@ -7,7 +7,6 @@
         <img src="../assets/logo.png" alt="Logo" class="logo" /> 
         <h1 class="brand-name">{{$t('app.title')}}</h1>
       </div>
-
       <!-- Основная навигация -->
       <nav class="main-nav">
         <v-btn
@@ -32,12 +31,8 @@
           {{$t('app.teams')}}
         </v-btn>
       </nav>
-
       <!-- Правая секция -->
       <div class="header-right">
-        <!-- Поиск, двусторонняя привязка -->
-        <!-- v-model="searchQuery" связывает значение поля ввода с переменной searchQuery в data -->
-        <!-- при изменении текста в поле ввода значение searchQuery автоматически обновляется, и наоборот -->
         <v-text-field
           v-model="searchQuery" 
           :placeholder="$t('app.search')"
@@ -53,7 +48,6 @@
         <LanguageChange />
       </div>
     </div>
-
     <!-- Вторая строка с календарем и фильтрами статуса -->
     <div class="header-second-row">
       <DatePicker 
@@ -85,9 +79,9 @@
 </template>
 
 <script>
-import ThemeChange from './ThemeChange.vue'
-import LanguageChange from './LanguageChange.vue'
-import DatePicker from './DatePicker.vue'
+import ThemeChange from '../components/ThemeChange.vue'
+import LanguageChange from '../components/LanguageChange.vue'
+import DatePicker from '../components/DatePicker.vue'
 import { useTheme } from 'vuetify'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -368,9 +362,7 @@ export default {
     font-size: 18px;
   }
 }
-</style>
 
-<style>
 html, body {
   background: var(--v-theme-background, #f8f9fa) !important;
 }

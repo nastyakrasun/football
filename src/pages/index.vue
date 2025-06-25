@@ -368,7 +368,7 @@ export default {
 
 .page-header h1 {
   font-size: 2.8rem;
-  color: #2c3e50;
+  color: #3498db;
   margin-bottom: 0.75rem;
   font-weight: 700;
   letter-spacing: -0.5px;
@@ -535,33 +535,28 @@ export default {
 /* Responsive Design */
 @media (max-width: 768px) {
   .matches-page {
-    padding: 1.5rem 1rem;
+    max-width: 100%;
+    margin: 0;
+    padding: 1.5rem 0.5rem;
   }
-
   .page-header h1 {
     font-size: 2rem;
   }
-
   .subtitle {
     font-size: 1.1rem;
   }
-
   .desktop-view {
     display: none;
   }
-
   .mobile-view {
     display: block;
   }
-
   .match-card-content {
     padding: 1rem;
   }
-
   .team-name {
     font-size: 0.9rem;
   }
-
   .team-score {
     font-size: 1.2rem;
   }
