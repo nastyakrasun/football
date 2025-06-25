@@ -47,10 +47,10 @@
       <div class="desktop-view" v-if="filteredMatches.length > 0">
         <v-data-table
           :headers="headers"
-          :items="filteredMatches"
+          :items="paginatedMatches"
           :items-per-page="itemsPerPage"
           class="elevation-1"
-          :footer-props="{ 'items-per-page-text': $t('app.items_per_page') }"
+          :footer-props="{ itemsPerPageOptions: [] }"
         >
           <template #headers="{ columns }">
             <tr>
@@ -82,59 +82,34 @@
             </tr>
           </template>
         </v-data-table>
+        <div class="desktop-pagination">
+          <Pagination
+            v-if="totalPages > 1"
+            :total-pages="totalPages"
+            :current-page="page"
+            @update:currentPage="page = $event"
+          />
+        </div>
       </div>
 
       <!-- Mobile Card View -->
       <div class="mobile-view" v-if="filteredMatches.length > 0">
         <div class="matches-cards">
-          <v-card
+          <MatchCard
             v-for="match in filteredMatches"
             :key="match.id"
-            class="match-card"
-            elevation="2"
-          >
-            <v-card-text class="match-card-content">
-              <!-- Match Date -->
-              <div class="match-date">
-                <v-icon icon="mdi-calendar" size="16" class="date-icon"></v-icon>
-                {{ formatMatchDate(match.utcDate) }}
-              </div>
-
-              <!-- Match Status -->
-              <div class="match-status">
-                <v-chip 
-                  :color="getStatusColor(match.status)" 
-                  size="small"
-                  class="status-chip"
-                >
-                  {{ getStatusText(match.status) }}
-                </v-chip>
-              </div>
-
-              <!-- Teams and Score -->
-              <div class="match-teams">
-                <div class="team home-team">
-                  <div class="team-name" :style="{ color: thColor, fontWeight: 'bold' }">{{ match.homeTeam?.name }}</div>
-                  <div class="team-score" :style="{ color: thColor }">{{ getHomeScore(match) }}</div>
-                </div>
-                
-                <div class="vs-divider">
-                  <span>-</span>
-                </div>
-                
-                <div class="team away-team">
-                  <div class="team-name" :style="{ color: thColor, fontWeight: 'normal' }">{{ match.awayTeam?.name }}</div>
-                  <div class="team-score" :style="{ color: thColor }">{{ getAwayScore(match) }}</div>
-                </div>
-              </div>
-
-              <!-- Match Time (for scheduled matches) -->
-              <div v-if="match.status === 'SCHEDULED'" class="match-time">
-                <v-icon icon="mdi-clock" size="16" class="time-icon"></v-icon>
-                {{ formatMatchTime(match.utcDate) }}
-              </div>
-            </v-card-text>
-          </v-card>
+            :competitionName="match.competition?.name || entity.name || '-'"
+            :matchDate="formatMatchDate(match.utcDate)"
+            :statusColor="getStatusColor(match.status)"
+            :statusText="getStatusText(match.status)"
+            :homeTeamName="match.homeTeam?.name"
+            :homeScore="getHomeScore(match)"
+            :awayTeamName="match.awayTeam?.name"
+            :awayScore="getAwayScore(match)"
+            :thColor="thColor"
+            :isScheduled="match.status === 'SCHEDULED'"
+            :matchTime="formatMatchTime(match.utcDate)"
+          />
         </div>
       </div>
     </template>
@@ -145,9 +120,11 @@
 import api from '@/api'
 import { useTheme } from 'vuetify'
 import { computed } from 'vue'
+import MatchCard from '@/components/MatchCard.vue'
+import Pagination from '@/components/Pagination.vue'
 
 export default {
-  name: 'MatchesTable',
+  name: 'LeaguesTable',
   props: {
     entityType: {
       type: String,
@@ -229,34 +206,31 @@ export default {
         { key: 'awayteam', title: this.$t('app.table_away') },
         { key: 'score', title: this.$t('app.table_score') },
       ];
+    },
+    isMobile() {
+      return window.innerWidth <= 768;
+    },
+    tableFooterProps() {
+      return this.isMobile
+        ? { itemsPerPageOptions: [] } // Hide footer on mobile
+        : { 'items-per-page-text': this.$t('app.items_per_page') };
     }
   },
   methods: {
     async fetchData() {
       this.isLoading = true
       this.error = null
-      
       try {
-        let entityResponse, matchesResponse;
-        
-        if (this.entityType === 'league') {
-          [entityResponse, matchesResponse] = await Promise.all([
-            api.get(`api/v4/competitions/${this.entityId}`),
-            api.get(`api/v4/competitions/${this.entityId}/matches`)
-          ])
-        } else if (this.entityType === 'team') {
-          [entityResponse, matchesResponse] = await Promise.all([
-            api.get(`api/v2/teams/${this.entityId}`),
-            api.get(`api/v2/teams/${this.entityId}/matches`)
-          ])
-        }
-
+        // Only fetch league data
+        const [entityResponse, matchesResponse] = await Promise.all([
+          api.get(`api/v4/competitions/${this.entityId}`),
+          api.get(`api/v4/competitions/${this.entityId}/matches`)
+        ])
         this.entity = entityResponse.data
         this.matches = matchesResponse.data.matches
       } catch (err) {
-        const entityName = this.entityType === 'league' ? 'лиги' : 'команды'
-        this.error = `Не удалось загрузить данные ${entityName}. Пожалуйста, попробуйте позже.`
-        console.error(`${this.entityType} data error:`, err)
+        this.error = `Не удалось загрузить данные лиги. Пожалуйста, попробуйте позже.`
+        console.error(`league data error:`, err)
       } finally {
         this.isLoading = false
       }
@@ -294,29 +268,15 @@ export default {
       return statusMap[status] || 'grey'
     },
     getScoreText(item) {
-      if (this.entityType === 'league') {
-        return item.score.fullTime.home !== null && item.score.fullTime.away !== null
-          ? `${item.score.fullTime.home} - ${item.score.fullTime.away}`
-          : '-'
-      } else {
-        return item.score.fullTime.homeTeam !== null && item.score.fullTime.awayTeam !== null
-          ? `${item.score.fullTime.homeTeam} - ${item.score.fullTime.awayTeam}`
-          : '-'
-      }
+      return item.score.fullTime.home !== null && item.score.fullTime.away !== null
+        ? `${item.score.fullTime.home} - ${item.score.fullTime.away}`
+        : '-'
     },
     getHomeScore(match) {
-      if (this.entityType === 'league') {
-        return match.score.fullTime.home !== null ? match.score.fullTime.home : '-'
-      } else {
-        return match.score.fullTime.homeTeam !== null ? match.score.fullTime.homeTeam : '-'
-      }
+      return match.score.fullTime.home !== null ? match.score.fullTime.home : '-'
     },
     getAwayScore(match) {
-      if (this.entityType === 'league') {
-        return match.score.fullTime.away !== null ? match.score.fullTime.away : '-'
-      } else {
-        return match.score.fullTime.awayTeam !== null ? match.score.fullTime.awayTeam : '-'
-      }
+      return match.score.fullTime.away !== null ? match.score.fullTime.away : '-'
     },
     formatMatchDate(dateString) { // форматирование даты с русской локализацией и учетом часового пояса
       const date = new Date(dateString)
@@ -344,7 +304,11 @@ export default {
     entityId() {
       this.fetchData()
     }
-  }
+  },
+  components: {
+    MatchCard,
+    Pagination
+  },
 }
 </script>
 
@@ -562,6 +526,10 @@ export default {
   .vs-divider {
     padding: 0 0.75rem;
   }
+
+  .desktop-pagination {
+    display: none !important;
+  }
 }
 
 @media (max-width: 480px) {
@@ -587,6 +555,42 @@ export default {
 
   .vs-divider {
     padding: 0 0.5rem;
+  }
+}
+
+/* Add styles for new match card layout */
+.competition-name {
+  font-weight: 700;
+  color: #3498db;
+  font-size: 1.05rem;
+  margin-right: 0.5rem;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.match-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+.match-row-top {
+  margin-bottom: 0.75rem;
+}
+.match-row-datetime {
+  font-size: 0.92rem;
+  color: #7f8c8d;
+  gap: 1.5rem;
+}
+@media (max-width: 768px) {
+  .competition-name {
+    font-size: 0.98rem;
+  }
+  .match-row-datetime {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
   }
 }
 </style> 

@@ -2,8 +2,8 @@
   <div class="matches-list">
     <!-- Название страницы -->
     <div class="page-header">
-      <h1>{{$t(pageTitleKey)}}</h1>
-      <p class="subtitle">{{$t('app.page_subtitle')}}</p>
+      <h1>{{ $t(pageTitleKey) }}</h1>
+      <p class="subtitle">{{ $t("app.page_subtitle") }}</p>
     </div>
 
     <!-- Состояние загрузки -->
@@ -16,11 +16,7 @@
     </div>
 
     <!-- Состояние ошибки - сообщение об ошибке отображается в пользовательском интерфейсе -->
-    <v-alert 
-      v-else-if="error"
-      type="error"
-      class="ma-4"
-    >
+    <v-alert v-else-if="error" type="error" class="ma-4">
       {{ error }}
     </v-alert>
 
@@ -30,185 +26,170 @@
       type="info"
       class="ma-4"
     >
-      {{ searchQuery
-        ? $t(entityType === 'league' ? 'app.not_found_leagues' : 'app.not_found_teams')
-        : $t(entityType === 'league' ? 'app.not_available_leagues' : 'app.not_available_teams')
+      {{
+        searchQuery
+          ? $t(
+              entityType === "league"
+                ? "app.not_found_leagues"
+                : "app.not_found_teams"
+            )
+          : $t(
+              entityType === "league"
+                ? "app.not_available_leagues"
+                : "app.not_available_teams"
+            )
       }}
     </v-alert>
 
     <!-- Сетка элементов -->
     <template v-else>
       <div :class="`${entityType}s-grid`">
-        <v-card
-          v-for="item in paginatedItems"
+        <Card
+          v-for="item in itemsToShow"
           :key="item.id"
-          :class="`${entityType}-card`"
-          @click="goToItem(item.id)"
-        >
-          <v-img
-            :src="getItemImage(item)"
-            :height="entityType === 'league' ? 100 : 150"
-            center
-            :class="`${entityType}-image`"
-          >
-            <template v-slot:placeholder>
-              <v-row
-                class="fill-height ma-0"
-                align="center"
-                justify="center"
-              >
-                <v-progress-circular
-                  indeterminate
-                  color="grey-lighten-4"
-                ></v-progress-circular>
-              </v-row>
-            </template>
-          </v-img>
-
-          <v-card-title :class="`${entityType}-name`">
-            {{ item.name }}
-          </v-card-title>
-
-          <v-card-text v-if="entityType === 'league'">
-            <div class="item-info">
-              <div class="info-item">
-                <v-img
-                  :src="'/src/assets/free-icon-pin-919412.png'"
-                  width="24"
-                  height="24"
-                  class="info-icon"
-                />
-                <span>{{ item.area?.name || $t('app.not_specified') }}</span>
-              </div>
-            </div>
-          </v-card-text>
-        </v-card>
+          :id="item.id"
+          :name="item.name"
+          :image="
+            entityType === 'league'
+              ? item.emblem || '/src/assets/free-icon-football-club-919408.png'
+              : item.crest || '/src/assets/free-icon-soccer-player-919397.png'
+          "
+          :subtitle="
+            entityType === 'league'
+              ? item.area?.name || $t('app.not_specified')
+              : ''
+          "
+          :imgHeight="entityType === 'league' ? 100 : 150"
+          @handle-card-click="goToItem"
+        />
       </div>
 
       <!-- Пагинация -->
-      <Pagination
-        v-if="filteredItems.length > 0"
-        :total-pages="totalPages"
-        :current-page="page"
-        @update:currentPage="handlePageChange"
-      />
+      <div class="desktop-pagination">
+        <Pagination
+          v-if="filteredItems.length > 0"
+          :total-pages="totalPages"
+          :current-page="page"
+          @update:currentPage="handlePageChange"
+        />
+      </div>
     </template>
   </div>
 </template>
 
 <script>
-import api from '@/api'
-import Pagination from '@/components/Pagination.vue'
+import api from "@/api";
+import Pagination from "@/components/Pagination.vue";
+import Card from "@/components/Card.vue";
 
 export default {
-  name: 'MatchesList',
+  name: "MatchesList",
   components: {
-    Pagination
+    Pagination,
+    Card,
   },
   props: {
     entityType: {
       type: String,
       required: true,
-      validator: value => ['league', 'team'].includes(value)
+      validator: (value) => ["league", "team"].includes(value),
     },
     searchQuery: {
       type: String,
-      default: ''
-    }
+      default: "",
+    },
   },
   data() {
     return {
-      items: [],        // REACTIVE: список лиг/команд
-      isLoading: true,  // REACTIVE: состояние загрузки
-      error: null,      // REACTIVE: сообщение об ошибке
-      page: 1,          // REACTIVE: текущая страница пагинации
-      itemsPerPage: this.entityType === 'league' ? 9 : 10 // REACTIVE: количество элементов данных на странице
-    }
+      items: [], // REACTIVE: список лиг/команд
+      isLoading: true, // REACTIVE: состояние загрузки
+      error: null, // REACTIVE: сообщение об ошибке
+      page: 1, // REACTIVE: текущая страница пагинации
+      itemsPerPage: this.entityType === "league" ? 9 : 10, // REACTIVE: количество элементов данных на странице
+    };
   },
   computed: {
     pageTitleKey() {
-      return this.entityType === 'league' ? 'app.page_title_leagues' : 'app.page_title_teams'
+      return this.entityType === "league"
+        ? "app.page_title_leagues"
+        : "app.page_title_teams";
     },
     entityTypeText() {
-      return this.entityType === 'league' ? 'лиг' : 'команд'
+      return this.entityType === "league" ? "лиг" : "команд";
     },
     filteredItems() {
-      if (!this.searchQuery) return this.items
-      
-      const query = this.searchQuery.toLowerCase()
-      return this.items.filter(item => {
-        const nameMatch = item.name.toLowerCase().includes(query)
-        const areaMatch = item.area?.name.toLowerCase().includes(query)
-        const tlaMatch = this.entityType === 'team' ? item.tla?.toLowerCase().includes(query) : false
-        
-        return nameMatch || areaMatch || tlaMatch
-      })
+      if (!this.searchQuery) return this.items;
+      const query = this.searchQuery.toLowerCase();
+      return this.items.filter((item) => {
+        const nameMatch = item.name.toLowerCase().includes(query);
+        const areaMatch = item.area?.name.toLowerCase().includes(query);
+        const tlaMatch =
+          this.entityType === "team"
+            ? item.tla?.toLowerCase().includes(query)
+            : false;
+        return nameMatch || areaMatch || tlaMatch;
+      });
     },
     totalPages() {
-      return Math.ceil(this.filteredItems.length / this.itemsPerPage)
+      return Math.ceil(this.filteredItems.length / this.itemsPerPage);
     },
     paginatedItems() {
-      const start = (this.page - 1) * this.itemsPerPage
-      const end = start + this.itemsPerPage
-      return this.filteredItems.slice(start, end)
-    }
+      const start = (this.page - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.filteredItems.slice(start, end);
+    },
+    isMobile() {
+      return window.innerWidth <= 768;
+    },
+    itemsToShow() {
+      return this.isMobile ? this.filteredItems : this.paginatedItems;
+    },
   },
   methods: {
-    async fetchData() { // использую `async fetchData()" с "await api.get(...)" для получения данных с сервера
-      this.isLoading = true
-      this.error = null
-      
-      try { // пытается получить данные из API
-        const endpoint = this.entityType === 'league' ? 'api/v4/competitions' : 'api/v4/teams'
-        const response = await api.get(endpoint) // await api.get(...) используется для получения данных с сервера
-        
-        const dataKey = this.entityType === 'league' ? 'competitions' : 'teams'
-        // результат сохраняется в реактивных переменных (this.items, this.entity, this.matches)
+    async fetchData() {
+      this.isLoading = true;
+      this.error = null;
+      try {
+        const endpoint =
+          this.entityType === "league" ? "api/v4/competitions" : "api/v4/teams";
+        const response = await api.get(endpoint);
+        const dataKey = this.entityType === "league" ? "competitions" : "teams";
         if (response.data && Array.isArray(response.data[dataKey])) {
-          this.items = response.data[dataKey]
-          this.page = 1 // Reset to first page when new data is loaded
+          this.items = response.data[dataKey];
+          this.page = 1;
         } else {
-          throw new Error('Неверный формат данных')
+          throw new Error("Неверный формат данных");
         }
-        // Если запрос не выполняется или формат данных неверен, блок catch присваивает реактивной переменной error понятное сообщение об ошибке
-      } catch (err) { // ошибки перехватываются и обрабатываются
-        this.error = err.message === 'Неверный формат данных' 
-          ? 'Ошибка в формате данных. Пожалуйста, попробуйте позже.'
-          : `Не удалось загрузить список ${this.entityTypeText}. Пожалуйста, попробуйте позже.`
-        console.error(`Loading error ${this.entityTypeText}:`, err)
+      } catch (err) {
+        this.error =
+          err.message === "Неверный формат данных"
+            ? "Ошибка в формате данных. Пожалуйста, попробуйте позже."
+            : `Не удалось загрузить список ${this.entityTypeText}. Пожалуйста, попробуйте позже.`;
+        console.error(`Loading error ${this.entityTypeText}:`, err);
       } finally {
-        this.isLoading = false
+        this.isLoading = false;
       }
     },
-    getItemImage(item) {
-      if (this.entityType === 'league') {
-        return item.emblem || '/src/assets/free-icon-football-club-919408.png'
-      } else {
-        return item.crest || '/src/assets/free-icon-soccer-player-919397.png'
-      }
-    },
-    goToItem(itemId) {
-      const route = this.entityType === 'league' ? `/league/${itemId}` : `/team/${itemId}`
-      this.$router.push(route)
+    goToItem(payload) {
+      const id = payload.id;
+      const route =
+        this.entityType === "league" ? `/league/${id}` : `/team/${id}`;
+      this.$router.push(route);
     },
     handlePageChange(newPage) {
-      this.page = newPage
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
-  },
-  watch: { // перехватчик жизненного цикла, используется для реагирования на изменения в prop 
-    searchQuery() {
-      this.page = 1 // перенаправление на страницу 1 при изменении searchQuery
+      this.page = newPage;
+      window.scrollTo({ top: 0, behavior: "smooth" });
     },
-    entityType() { // при изменении entityType количество элементов на странице обновляется и извлекаются новые данные
-      this.itemsPerPage = this.entityType === 'league' ? 9 : 10
-      this.fetchData()
-    }
+  },
+  watch: {
+    searchQuery() {
+      this.page = 1;
+    },
   },
   mounted() {
-    this.fetchData() // Метод вызывается в перехватчике жизненного цикла mounted(), поэтому данные загружаются при появлении компонента
-  }
-}
+    this.fetchData();
+  },
+};
 </script>
 
 <style scoped>
@@ -226,7 +207,7 @@ export default {
 }
 
 .page-header::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -1rem;
   left: 50%;
@@ -298,7 +279,7 @@ export default {
 .league-name {
   font-size: 1.3rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: #3498db;
   padding: 1rem 1rem 0.5rem;
   line-height: 1.4;
 }
@@ -343,7 +324,7 @@ export default {
 .team-name {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: #3498db;
   padding: 1rem;
   line-height: 1.4;
   text-align: center;
@@ -416,5 +397,9 @@ export default {
     font-size: 1rem;
     padding: 0.75rem;
   }
+
+  .desktop-pagination {
+    display: none !important;
+  }
 }
-</style> 
+</style>

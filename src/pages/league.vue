@@ -1,5 +1,5 @@
 <template>
-  <MatchesTable 
+  <LeaguesTable 
     entity-type="league"
     :entity-id="$route.params.id"
     :search-query="searchQuery"
@@ -9,12 +9,12 @@
 </template>
 
 <script>
-import MatchesTable from '@/components/MatchesTable.vue'
+import LeaguesTable from '@/components/LeaguesTable.vue'
 
 export default {
   name: 'LeaguePage',
   components: {
-    MatchesTable
+    LeaguesTable
   },
   props: {
     searchQuery: {

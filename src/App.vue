@@ -1,35 +1,25 @@
 <!-- корневой файл приложения .vue с корневым шаблоном, говорящим о том, что есть приложение с основной частью и роутером router-view -->
 <template>
-  <div class="app-container">
-    <AppHeader
+  <v-app>
+    <DefaultLayout
       @search="onSearch"
       :selected-date="selectedDate"
       @update:selected-date="selectedDate = $event"
       @date-change="onDateChange"
       :selected-status="selectedStatus"
       @update:selected-status="selectedStatus = $event"
-    />
-
-    <!-- Основное содержание -->
-    <main class="main-content">
-      <!-- router-view - этот роутер говорит о том, из каких элементов состоит наше приложение -->
+    >
       <router-view :searchQuery="searchQuery" :selectedDate="selectedDate" :selectedStatus="selectedStatus" />
-    </main>
-
-    <AppFooter />
-  </div>
+    </DefaultLayout>
+  </v-app>
 </template>
 
 <script>
-import AppHeader from '@/components/AppHeader.vue'
-import AppFooter from '@/components/AppFooter.vue'
+import DefaultLayout from '@/layouts/DefaultLayout.vue'
 
 export default {
   name: 'App',
-  components: {
-    AppHeader,
-    AppFooter
-  },
+  components: { DefaultLayout },
   data() {
     return {
       searchQuery: "",
