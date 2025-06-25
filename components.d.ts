@@ -10,6 +10,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AppFooter: typeof import('./src/components/AppFooter.vue')['default']
     AppHeader: typeof import('./src/components/AppHeader.vue')['default']
+    Card: typeof import('./src/components/Card.vue')['default']
     DatePicker: typeof import('./src/components/DatePicker.vue')['default']
     LanguageChange: typeof import('./src/components/LanguageChange.vue')['default']
     MatchesList: typeof import('./src/components/MatchesList.vue')['default']

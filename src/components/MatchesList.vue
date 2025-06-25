@@ -39,50 +39,16 @@
     <!-- Сетка элементов -->
     <template v-else>
       <div :class="`${entityType}s-grid`">
-        <v-card
+        <Card
           v-for="item in paginatedItems"
           :key="item.id"
-          :class="`${entityType}-card`"
-          @click="goToItem(item.id)"
-        >
-          <v-img
-            :src="getItemImage(item)"
-            :height="entityType === 'league' ? 100 : 150"
-            center
-            :class="`${entityType}-image`"
-          >
-            <template v-slot:placeholder>
-              <v-row
-                class="fill-height ma-0"
-                align="center"
-                justify="center"
-              >
-                <v-progress-circular
-                  indeterminate
-                  color="grey-lighten-4"
-                ></v-progress-circular>
-              </v-row>
-            </template>
-          </v-img>
-
-          <v-card-title :class="`${entityType}-name`">
-            {{ item.name }}
-          </v-card-title>
-
-          <v-card-text v-if="entityType === 'league'">
-            <div class="item-info">
-              <div class="info-item">
-                <v-img
-                  :src="'/src/assets/free-icon-pin-919412.png'"
-                  width="24"
-                  height="24"
-                  class="info-icon"
-                />
-                <span>{{ item.area?.name || $t('app.not_specified') }}</span>
-              </div>
-            </div>
-          </v-card-text>
-        </v-card>
+          :id="item.id"
+          :name="item.name"
+          :image="entityType === 'league' ? (item.emblem || '/src/assets/free-icon-football-club-919408.png') : (item.crest || '/src/assets/free-icon-soccer-player-919397.png')"
+          :subtitle="entityType === 'league' ? (item.area?.name || $t('app.not_specified')) : ''"
+          :imgHeight="entityType === 'league' ? 100 : 150"
+          @handle-card-click="goToItem"
+        />
       </div>
 
       <!-- Пагинация -->
@@ -99,11 +65,13 @@
 <script>
 import api from '@/api'
 import Pagination from '@/components/Pagination.vue'
+import Card from '@/components/Card.vue'
 
 export default {
   name: 'MatchesList',
   components: {
-    Pagination
+    Pagination,
+    Card
   },
   props: {
     entityType: {
@@ -134,13 +102,11 @@ export default {
     },
     filteredItems() {
       if (!this.searchQuery) return this.items
-      
       const query = this.searchQuery.toLowerCase()
       return this.items.filter(item => {
         const nameMatch = item.name.toLowerCase().includes(query)
         const areaMatch = item.area?.name.toLowerCase().includes(query)
         const tlaMatch = this.entityType === 'team' ? item.tla?.toLowerCase().includes(query) : false
-        
         return nameMatch || areaMatch || tlaMatch
       })
     },
@@ -154,24 +120,20 @@ export default {
     }
   },
   methods: {
-    async fetchData() { // использую `async fetchData()" с "await api.get(...)" для получения данных с сервера
+    async fetchData() {
       this.isLoading = true
       this.error = null
-      
-      try { // пытается получить данные из API
+      try {
         const endpoint = this.entityType === 'league' ? 'api/v4/competitions' : 'api/v4/teams'
-        const response = await api.get(endpoint) // await api.get(...) используется для получения данных с сервера
-        
+        const response = await api.get(endpoint)
         const dataKey = this.entityType === 'league' ? 'competitions' : 'teams'
-        // результат сохраняется в реактивных переменных (this.items, this.entity, this.matches)
         if (response.data && Array.isArray(response.data[dataKey])) {
           this.items = response.data[dataKey]
-          this.page = 1 // Reset to first page when new data is loaded
+          this.page = 1
         } else {
           throw new Error('Неверный формат данных')
         }
-        // Если запрос не выполняется или формат данных неверен, блок catch присваивает реактивной переменной error понятное сообщение об ошибке
-      } catch (err) { // ошибки перехватываются и обрабатываются
+      } catch (err) {
         this.error = err.message === 'Неверный формат данных' 
           ? 'Ошибка в формате данных. Пожалуйста, попробуйте позже.'
           : `Не удалось загрузить список ${this.entityTypeText}. Пожалуйста, попробуйте позже.`
@@ -180,15 +142,9 @@ export default {
         this.isLoading = false
       }
     },
-    getItemImage(item) {
-      if (this.entityType === 'league') {
-        return item.emblem || '/src/assets/free-icon-football-club-919408.png'
-      } else {
-        return item.crest || '/src/assets/free-icon-soccer-player-919397.png'
-      }
-    },
-    goToItem(itemId) {
-      const route = this.entityType === 'league' ? `/league/${itemId}` : `/team/${itemId}`
+    goToItem(payload) {
+      const id = payload.id
+      const route = this.entityType === 'league' ? `/league/${id}` : `/team/${id}`
       this.$router.push(route)
     },
     handlePageChange(newPage) {
@@ -196,17 +152,13 @@ export default {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   },
-  watch: { // перехватчик жизненного цикла, используется для реагирования на изменения в prop 
+  watch: {
     searchQuery() {
-      this.page = 1 // перенаправление на страницу 1 при изменении searchQuery
-    },
-    entityType() { // при изменении entityType количество элементов на странице обновляется и извлекаются новые данные
-      this.itemsPerPage = this.entityType === 'league' ? 9 : 10
-      this.fetchData()
+      this.page = 1
     }
   },
   mounted() {
-    this.fetchData() // Метод вызывается в перехватчике жизненного цикла mounted(), поэтому данные загружаются при появлении компонента
+    this.fetchData()
   }
 }
 </script>
