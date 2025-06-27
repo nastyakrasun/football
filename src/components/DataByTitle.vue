@@ -40,7 +40,7 @@
         <v-data-table
           :headers="headers"
           :items="filteredMatches"
-          :items-per-page="filteredMatches.length"
+          :items-per-page="itemsPerPage"
           class="elevation-1"
           :footer-props="{ itemsPerPageOptions: [] }"
         >
@@ -149,7 +149,7 @@ export default {
       isLoading: true,
       error: null,
       page: 1,
-      itemsPerPage: 9999,
+      itemsPerPage: 10,
     };
   },
   setup() {
