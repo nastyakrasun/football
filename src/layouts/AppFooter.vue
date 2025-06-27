@@ -17,6 +17,9 @@
             <h3>{{ $t("app.go_to") }}</h3>
             <ul class="footer-links">
               <li>
+                <router-link to="/">{{ $t("app.home") }}</router-link>
+              </li>
+              <li>
                 <router-link to="/leagues">{{ $t("app.leagues") }}</router-link>
               </li>
               <li>

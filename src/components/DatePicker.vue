@@ -21,16 +21,12 @@
     >
       <v-card class="calendar-dialog">
         <v-card-title class="dialog-title">
-          {{ $t('app.calendar') }}
-          <v-btn
-            icon
-            @click="showDialog = false"
-            class="close-btn"
-          >
+          {{ $t("app.calendar") }}
+          <v-btn icon @click="showDialog = false" class="close-btn">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-card-title>
-        
+
         <v-card-text class="dialog-content">
           <v-date-picker
             v-model="selectedDate"
@@ -39,19 +35,19 @@
             elevation="2"
             class="calendar-picker"
           />
-          
+
           <div class="selected-date-display">
-          <v-text-field 
-              v-model="selectedDateDisplay" 
+            <v-text-field
+              v-model="selectedDateDisplay"
               :label="$t('app.selectedDate')"
-            readonly
-            variant="outlined"
+              readonly
+              variant="outlined"
               density="compact"
               class="mt-3"
-          />
+            />
           </div>
         </v-card-text>
-        
+
         <v-card-actions class="dialog-actions">
           <v-btn
             @click="clearFilter"
@@ -60,7 +56,7 @@
             class="clear-btn"
             size="small"
           >
-            {{ $t('app.clear') }}
+            {{ $t("app.clear") }}
           </v-btn>
           <v-spacer></v-spacer>
           <v-btn
@@ -69,121 +65,133 @@
             variant="elevated"
             size="small"
           >
-            {{ $t('app.ok') }}
+            {{ $t("app.ok") }}
           </v-btn>
         </v-card-actions>
-  </v-card>
+      </v-card>
     </v-dialog>
   </div>
 </template>
 
 <script>
-import { useTheme } from 'vuetify'
-import { useI18n } from 'vue-i18n'
-import { ref, computed } from 'vue'
+import { useTheme } from "vuetify";
+import { useI18n } from "vue-i18n";
+import { ref, computed } from "vue";
 
 export default {
-  name: 'DatePicker',
+  name: "DatePicker",
   props: {
     modelValue: {
       type: [String, Date],
-      default: null
-    }
+      default: null,
+    },
   },
-  emits: ['update:modelValue', 'date-change'],
+  emits: ["update:modelValue", "date-change"],
   setup(props, { emit }) {
-    const theme = useTheme()
-    const { t } = useI18n()
-    const showDialog = ref(false)
+    const theme = useTheme();
+    const { t, locale } = useI18n();
+    const showDialog = ref(false);
     const selectedDate = computed({
       get() {
         if (!props.modelValue) return null;
-        if (typeof props.modelValue === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(props.modelValue)) {
+        if (
+          typeof props.modelValue === "string" &&
+          /^\d{4}-\d{2}-\d{2}$/.test(props.modelValue)
+        ) {
           return props.modelValue;
         }
         if (props.modelValue instanceof Date) {
           const year = props.modelValue.getFullYear();
-          const month = String(props.modelValue.getMonth() + 1).padStart(2, '0');
-          const day = String(props.modelValue.getDate()).padStart(2, '0');
+          const month = String(props.modelValue.getMonth() + 1).padStart(
+            2,
+            "0"
+          );
+          const day = String(props.modelValue.getDate()).padStart(2, "0");
           return `${year}-${month}-${day}`;
         }
-        if (typeof props.modelValue === 'string') {
+        if (typeof props.modelValue === "string") {
           const date = new Date(props.modelValue);
           if (!isNaN(date.getTime())) {
             const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const day = String(date.getDate()).padStart(2, "0");
             return `${year}-${month}-${day}`;
           }
         }
         return null;
       },
       set(value) {
-        emit('update:modelValue', value)
-      }
-    })
+        emit("update:modelValue", value);
+      },
+    });
     const formattedShortDate = computed(() => {
-      if (!selectedDate.value) return t('app.selectDate')
+      if (!selectedDate.value) return t("app.selectDate");
       try {
-        const date = new Date(selectedDate.value + 'T00:00:00')
-        const day = String(date.getDate()).padStart(2, '0')
-        const month = String(date.getMonth() + 1).padStart(2, '0')
-        const year = String(date.getFullYear()).slice(-2)
-        return `${day}/${month}/${year}`
+        const date = new Date(selectedDate.value + "T00:00:00");
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = String(date.getFullYear()).slice(-2);
+        return `${day}/${month}/${year}`;
       } catch (error) {
-        return t('app.selectDate')
+        return t("app.selectDate");
       }
-    })
-    return { theme, t, showDialog, selectedDate, formattedShortDate }
+    });
+    const selectedDateDisplay = computed(() => {
+      if (!selectedDate.value) return "";
+      try {
+        const date = new Date(selectedDate.value + "T00:00:00");
+        return date.toLocaleDateString(locale.value, {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+      } catch (error) {
+        return selectedDate.value;
+      }
+    });
+    return {
+      theme,
+      t,
+      locale,
+      showDialog,
+      selectedDate,
+      formattedShortDate,
+      selectedDateDisplay,
+    };
   },
   data() {
     return {
       // selectedDateDisplay: '' // Removed to avoid conflict with computed property
-    }
+    };
   },
   computed: {
-    selectedDateDisplay() {
-      if (!this.selectedDate) return '';
-      
+    formattedDate() {
+      if (!this.selectedDate) return "";
+
       try {
-        const date = new Date(this.selectedDate + 'T00:00:00');
-        return date.toLocaleDateString('ru-RU', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
+        const date = new Date(this.selectedDate + "T00:00:00");
+        return date.toLocaleDateString("ru-RU", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
         });
       } catch (error) {
-        console.error('Error formatting date display:', error);
+        console.error("Error formatting date:", error);
         return this.selectedDate;
       }
     },
-    formattedDate() {
-      if (!this.selectedDate) return '';
-      
-      try {
-        const date = new Date(this.selectedDate + 'T00:00:00');
-        return date.toLocaleDateString('ru-RU', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        });
-      } catch (error) {
-        console.error('Error formatting date:', error);
-        return this.selectedDate;
-      }
-    }
   },
   methods: {
     onDateChange() {
-      this.$emit('date-change');
+      this.$emit("date-change");
     },
     clearFilter() {
       this.selectedDate = null;
-      this.$emit('update:modelValue', null);
-      this.$emit('date-change');
-    }
-  }
-}
+      this.$emit("update:modelValue", null);
+      this.$emit("date-change");
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -374,19 +382,19 @@ export default {
     padding: 2px 4px;
     margin-left: 0px;
     margin-top: 6px;
-    /*gap: 4px; */   
+    /*gap: 4px; */
   }
-  
+
   .date-text {
     font-size: 10px;
-    min-width: 30px;    
+    min-width: 30px;
   }
-  
+
   .calendar-icon {
     font-size: 18px;
     display: none;
   }
-  
+
   .arrow-icon {
     font-size: 14px;
   }
@@ -397,7 +405,7 @@ export default {
     display: flex;
     flex-direction: column;
     max-height: 100vh;
-}
+  }
 
   .dialog-title {
     padding: 12px 16px;
@@ -414,35 +422,35 @@ export default {
   .calendar-picker {
     border-radius: 6px;
     border: 1px solid rgba(44, 62, 80, 0.1);
-}
+  }
 
   .calendar-picker :deep(.v-date-picker-header) {
-  padding: 8px;
-}
+    padding: 8px;
+  }
 
   .calendar-picker :deep(.v-date-picker-header__title) {
     font-size: 0.9rem;
-}
+  }
 
   .calendar-picker :deep(.v-date-picker-table) {
     padding: 4px;
-}
+  }
 
   .calendar-picker :deep(.v-date-picker-table__day) {
     border-radius: 4px;
     font-size: 0.8rem;
-}
+  }
 
   .calendar-picker :deep(.v-date-picker-table__weekday) {
     font-size: 0.7rem;
-}
+  }
 
   .selected-date-display {
     margin-top: 8px;
-}
+  }
 
   .dialog-actions {
     padding: 8px 16px;
+  }
 }
-}
-</style> 
+</style>

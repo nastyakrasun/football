@@ -344,6 +344,7 @@ export default {
   }
   .logo {
     height: 32px;
+    margin-left: 0.5rem
   }
   .header-second-row {
     flex-direction: row;

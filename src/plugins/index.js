@@ -71,7 +71,7 @@ const messages = {
       of: "of",
       ok: "OK",
       status_all: "All",
-      all_matches: "All Matches",
+      all_matches: "Matches",
       all_matches_subtitle:
         "Live scores and match schedules from top football leagues",
       table_competition: "Competition",
@@ -145,7 +145,7 @@ const messages = {
       of: "из",
       ok: "ОК",
       status_all: "Все",
-      all_matches: "Все матчи",
+      all_matches: "Матчи",
       all_matches_subtitle:
         "Результаты в реальном времени и расписание матчей из топ-лиг",
       table_competition: "Соревнование",

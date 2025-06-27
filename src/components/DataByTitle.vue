@@ -354,7 +354,7 @@ export default {
 
 .page-header h1 {
   font-size: 2.8rem;
-  color: #2c3e50;
+  color: #3498db;
   margin-bottom: 0.75rem;
   font-weight: 700;
   letter-spacing: -0.5px;
