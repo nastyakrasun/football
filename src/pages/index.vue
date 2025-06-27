@@ -2,35 +2,31 @@
 <template>
   <div class="matches-page">
     <!-- Заголовок страницы -->
-    <div class="page-header">
-      <h1>{{ $t('app.all_matches') }}</h1>
-      <p class="subtitle">{{ $t('app.all_matches_subtitle') }}</p>
+    <div class="page-header mobile-hide">
+      <h1>{{ $t("app.all_matches") }}</h1>
+      <p class="subtitle">{{ $t("app.all_matches_subtitle") }}</p>
     </div>
 
     <!-- Состояние загрузки -->
     <v-progress-circular
       v-if="isLoading"
       class="d-block mx-auto my-8"
-            color="primary"
+      color="primary"
       indeterminate
     />
 
     <!-- Состояние ошибки -->
-    <v-alert
-      v-else-if="error"
-      type="error"
-      class="ma-4"
-    >
+    <v-alert v-else-if="error" type="error" class="ma-4">
       {{ error }}
     </v-alert>
 
     <!-- Состояние нет результатов -->
-    <v-alert
-      v-else-if="filteredMatches.length === 0"
-      type="info"
-      class="ma-4"
-    >
-      {{ searchQuery ? $t('app.no_matches_found') : $t('app.no_matches_available') }}
+    <v-alert v-else-if="filteredMatches.length === 0" type="info" class="ma-4">
+      {{
+        searchQuery
+          ? $t("app.no_matches_found")
+          : $t("app.no_matches_available")
+      }}
     </v-alert>
 
     <!-- Таблица матчей -->
@@ -46,7 +42,11 @@
         >
           <template #headers="{ columns }">
             <tr>
-              <th v-for="column in columns" :key="column.key" :style="{ backgroundColor: thBg, color: thColor }">
+              <th
+                v-for="column in columns"
+                :key="column.key"
+                :style="{ backgroundColor: thBg, color: thColor }"
+              >
                 {{ column.title }}
               </th>
             </tr>
@@ -54,15 +54,21 @@
 
           <template #item="{ item, columns }">
             <tr>
-              <td v-for="column in columns" :key="column.key" :style="{ color: thColor }">
-                <span v-if="column.key === 'utcDate'">{{ new Date(item.utcDate).toLocaleString() }}</span>
+              <td
+                v-for="column in columns"
+                :key="column.key"
+                :style="{ color: thColor }"
+              >
+                <span v-if="column.key === 'utcDate'">{{
+                  new Date(item.utcDate).toLocaleString()
+                }}</span>
                 <span v-else-if="column.key === 'status'">
                   <v-chip :color="getStatusColor(item.status)" small>
                     {{ getStatusText(item.status) }}
                   </v-chip>
                 </span>
                 <span v-else-if="column.key === 'competition'">
-                  {{ item.competition?.name || '-' }}
+                  {{ item.competition?.name || "-" }}
                 </span>
                 <span v-else-if="column.key === 'hometeam'">
                   <b>{{ item.homeTeam?.name }}</b>
@@ -83,6 +89,7 @@
       <div class="mobile-view" v-if="filteredMatches.length > 0">
         <div class="matches-cards">
           <MatchCard
+            type="match"
             v-for="match in filteredMatches"
             :key="match.id"
             :competitionName="match.competition?.name || '-'"
@@ -104,26 +111,26 @@
 </template>
 
 <script>
-import api from '@/api'
-import { useTheme } from 'vuetify'
-import { computed } from 'vue'
-import MatchCard from '@/components/MatchCard.vue'
+import api from "@/api";
+import { useTheme } from "vuetify";
+import { computed } from "vue";
+import MatchCard from "@/components/MatchCard.vue";
 
 export default {
-  name: 'HomePage',
+  name: "HomePage",
   props: {
     searchQuery: {
       type: String,
-      default: ''
+      default: "",
     },
     selectedDate: {
       type: [String, Date],
-      default: null
+      default: null,
     },
     selectedStatus: {
       type: String,
-      default: 'all'
-    }
+      default: "all",
+    },
   },
   data() {
     return {
@@ -132,175 +139,209 @@ export default {
       error: null,
       page: 1,
       itemsPerPage: 10,
-    }
+    };
   },
   setup() {
-    const theme = useTheme()
-    const thBg = computed(() => theme.global.name.value === 'dark' ? '#2c3e50' : '#f8f9fa')
-    const thColor = computed(() => theme.global.name.value === 'dark' ? '#f8f9fa' : '#2c3e50')
-    return { thBg, thColor }
+    const theme = useTheme();
+    const thBg = computed(() =>
+      theme.global.name.value === "dark" ? "#2c3e50" : "#f8f9fa"
+    );
+    const thColor = computed(() =>
+      theme.global.name.value === "dark" ? "#f8f9fa" : "#2c3e50"
+    );
+    return { thBg, thColor };
   },
   computed: {
     filteredMatches() {
       let filtered = this.matches;
-      
+
       // Фильтрация по поисковому запросу
       if (this.searchQuery) {
         const query = this.searchQuery.toLowerCase();
-        filtered = filtered.filter(match => {
+        filtered = filtered.filter((match) => {
           // Поиск по названию лиги/соревнования
-          const competitionMatch = match.competition?.name?.toLowerCase().includes(query);
-          
+          const competitionMatch = match.competition?.name
+            ?.toLowerCase()
+            .includes(query);
+
           // Поиск по названию домашней команды
-          const homeTeamMatch = match.homeTeam?.name?.toLowerCase().includes(query);
-          
+          const homeTeamMatch = match.homeTeam?.name
+            ?.toLowerCase()
+            .includes(query);
+
           // Поиск по названию гостевой команды
-          const awayTeamMatch = match.awayTeam?.name?.toLowerCase().includes(query);
-          
+          const awayTeamMatch = match.awayTeam?.name
+            ?.toLowerCase()
+            .includes(query);
+
           // Поиск по короткому названию домашней команды (TLA)
-          const homeTeamTlaMatch = match.homeTeam?.tla?.toLowerCase().includes(query);
-          
+          const homeTeamTlaMatch = match.homeTeam?.tla
+            ?.toLowerCase()
+            .includes(query);
+
           // Поиск по короткому названию гостевой команды (TLA)
-          const awayTeamTlaMatch = match.awayTeam?.tla?.toLowerCase().includes(query);
-          
-          return competitionMatch || homeTeamMatch || awayTeamMatch || homeTeamTlaMatch || awayTeamTlaMatch;
+          const awayTeamTlaMatch = match.awayTeam?.tla
+            ?.toLowerCase()
+            .includes(query);
+
+          return (
+            competitionMatch ||
+            homeTeamMatch ||
+            awayTeamMatch ||
+            homeTeamTlaMatch ||
+            awayTeamTlaMatch
+          );
         });
       }
-      
+
       // Фильтрация по дате
       if (this.selectedDate) {
         let selectedDate;
         if (this.selectedDate instanceof Date) {
           selectedDate = this.selectedDate;
-        } else if (typeof this.selectedDate === 'string') {
-          selectedDate = new Date(this.selectedDate + 'T00:00:00');
+        } else if (typeof this.selectedDate === "string") {
+          selectedDate = new Date(this.selectedDate + "T00:00:00");
         }
         if (selectedDate) {
           selectedDate.setHours(0, 0, 0, 0);
-          filtered = filtered.filter(match => {
+          filtered = filtered.filter((match) => {
             const matchDate = new Date(match.utcDate);
             matchDate.setHours(0, 0, 0, 0);
             return matchDate.getTime() === selectedDate.getTime();
           });
         }
       }
-      
+
       // Фильтрация по статусу
-      if (this.selectedStatus && this.selectedStatus !== 'all') {
-        filtered = filtered.filter(match => match.status === this.selectedStatus);
+      if (this.selectedStatus && this.selectedStatus !== "all") {
+        filtered = filtered.filter(
+          (match) => match.status === this.selectedStatus
+        );
       }
-      
+
       return filtered;
     },
     headers() {
       return [
-        { key: 'utcDate', title: this.$t('app.table_date') },
-        { key: 'competition', title: this.$t('app.table_competition') },
-        { key: 'status', title: this.$t('app.table_status') },
-        { key: 'hometeam', title: this.$t('app.table_home') },
-        { key: 'awayteam', title: this.$t('app.table_away') },
-        { key: 'score', title: this.$t('app.table_score') },
+        { key: "utcDate", title: this.$t("app.table_date") },
+        { key: "competition", title: this.$t("app.table_competition") },
+        { key: "status", title: this.$t("app.table_status") },
+        { key: "hometeam", title: this.$t("app.table_home") },
+        { key: "awayteam", title: this.$t("app.table_away") },
+        { key: "score", title: this.$t("app.table_score") },
       ];
-    }
+    },
   },
   methods: {
     async fetchData() {
-      this.isLoading = true
-      this.error = null
+      this.isLoading = true;
+      this.error = null;
       try {
         // Получаем матчи из нескольких популярных лиг
         const competitions = [
-          'PL', // Premier League
-          'PD', // La Liga
-          'SA', // Serie A
-          'BL1', // Bundesliga
-          'FL1', // Ligue 1
-          'CL', // Champions League
-          'EL', // Europa League
-        ]
-        const matchPromises = competitions.map(competition =>
-          api.get(`api/v4/competitions/${competition}/matches`).catch(err => {
-            console.warn(`Failed to fetch matches for competition ${competition}:`, err)
-            return { data: { matches: [] } }
+          "PL", // Premier League
+          "PD", // La Liga
+          "SA", // Serie A
+          "BL1", // Bundesliga
+          "FL1", // Ligue 1
+          "CL", // Champions League
+        ];
+        const matchPromises = competitions.map((competition) =>
+          api.get(`api/v4/competitions/${competition}/matches`).catch((err) => {
+            console.warn(
+              `Failed to fetch matches for competition ${competition}:`,
+              err
+            );
+            return { data: { matches: [] } };
           })
-        )
-        const responses = await Promise.all(matchPromises)
-        const allMatches = responses.flatMap(response => response.data.matches || [])
+        );
+        const responses = await Promise.all(matchPromises);
+        const allMatches = responses.flatMap(
+          (response) => response.data.matches || []
+        );
         // Сортируем по дате (новые сначала)
-        this.matches = allMatches.sort((a, b) => new Date(b.utcDate) - new Date(a.utcDate))
+        this.matches = allMatches.sort(
+          (a, b) => new Date(b.utcDate) - new Date(a.utcDate)
+        );
       } catch (err) {
-        this.error = 'Не удалось загрузить матчи. Пожалуйста, попробуйте позже.'
-        console.error('Matches fetch error:', err)
+        this.error =
+          "Не удалось загрузить матчи. Пожалуйста, попробуйте позже.";
+        console.error("Matches fetch error:", err);
       } finally {
-        this.isLoading = false
+        this.isLoading = false;
       }
     },
     getStatusText(status) {
       const statusMap = {
-        SCHEDULED: this.$t('app.status_scheduled'),
-        LIVE: this.$t('app.status_live'),
-        IN_PLAY: this.$t('app.status_in_play'),
-        PAUSED: this.$t('app.status_paused'),
-        FINISHED: this.$t('app.status_finished'),
-        POSTPONED: this.$t('app.status_postponed'),
-        SUSPENDED: this.$t('app.status_suspended'),
-        CANCELLED: this.$t('app.status_cancelled'),
-        TIMED: this.$t('app.status_timed'),
-        ABANDONED: this.$t('app.status_abandoned'),
-        TECHNICAL_LOSS: this.$t('app.status_technical_loss'),
-      }
-      return statusMap[status] || status
+        SCHEDULED: this.$t("app.status_scheduled"),
+        LIVE: this.$t("app.status_live"),
+        IN_PLAY: this.$t("app.status_in_play"),
+        PAUSED: this.$t("app.status_paused"),
+        FINISHED: this.$t("app.status_finished"),
+        POSTPONED: this.$t("app.status_postponed"),
+        SUSPENDED: this.$t("app.status_suspended"),
+        CANCELLED: this.$t("app.status_cancelled"),
+        TIMED: this.$t("app.status_timed"),
+        ABANDONED: this.$t("app.status_abandoned"),
+        TECHNICAL_LOSS: this.$t("app.status_technical_loss"),
+      };
+      return statusMap[status] || status;
     },
     getStatusColor(status) {
-      const statusMap = {        
-        SCHEDULED: 'primary',
-        LIVE: 'error',
-        IN_PLAY: 'error',
-        PAUSED: 'warning',
-        FINISHED: 'success',
-        POSTPONED: 'warning',        
-        SUSPENDED: 'info',
-        CANCELLED: 'warning',
-        TIMED: 'primary',        
-        ABANDONED: 'error',
-        TECHNICAL_LOSS: 'error'
-      }
-      return statusMap[status] || 'grey'
+      const statusMap = {
+        SCHEDULED: "primary",
+        LIVE: "error",
+        IN_PLAY: "error",
+        PAUSED: "warning",
+        FINISHED: "success",
+        POSTPONED: "warning",
+        SUSPENDED: "info",
+        CANCELLED: "warning",
+        TIMED: "primary",
+        ABANDONED: "error",
+        TECHNICAL_LOSS: "error",
+      };
+      return statusMap[status] || "grey";
     },
     getScoreText(item) {
-      return item.score.fullTime.home !== null && item.score.fullTime.away !== null
+      return item.score.fullTime.home !== null &&
+        item.score.fullTime.away !== null
         ? `${item.score.fullTime.home} - ${item.score.fullTime.away}`
-        : '-'
+        : "-";
     },
     getHomeScore(match) {
-      return match.score.fullTime.home !== null ? match.score.fullTime.home : '-'
+      return match.score.fullTime.home !== null
+        ? match.score.fullTime.home
+        : "-";
     },
     getAwayScore(match) {
-      return match.score.fullTime.away !== null ? match.score.fullTime.away : '-'
+      return match.score.fullTime.away !== null
+        ? match.score.fullTime.away
+        : "-";
     },
     formatMatchDate(dateString) {
-      const date = new Date(dateString)
-      return date.toLocaleDateString('ru-RU', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      })
+      const date = new Date(dateString);
+      return date.toLocaleDateString("ru-RU", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
     },
     formatMatchTime(dateString) {
-      const date = new Date(dateString)
-      return date.toLocaleTimeString('ru-RU', {
-        hour: '2-digit',
-        minute: '2-digit'
-      })
-    }
+      const date = new Date(dateString);
+      return date.toLocaleTimeString("ru-RU", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    },
   },
   components: {
     MatchCard,
   },
   mounted() {
-    this.fetchData()
-  }
-}
+    this.fetchData();
+  },
+};
 </script>
 
 <style scoped>
@@ -320,7 +361,7 @@ export default {
 }
 
 .page-header::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -1rem;
   left: 50%;
@@ -410,6 +451,9 @@ export default {
   }
   .mobile-view {
     display: block;
+  }
+  .mobile-hide {
+    display: none !important;
   }
 }
 </style>

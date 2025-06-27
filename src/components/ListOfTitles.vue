@@ -1,9 +1,9 @@
 <template>
   <div class="matches-list">
     <!-- Название страницы -->
-    <div class="page-header">
-      <h1>{{ $t(pageTitleKey) }}</h1>
-      <p class="subtitle">{{ $t("app.page_subtitle") }}</p>
+    <div class="page-header mobile-hide">
+      <h1>{{ pageTitle || $t(pageTitleKey) }}</h1>
+      <p class="subtitle">{{ pageSubtitle || $t("app.page_subtitle") }}</p>
     </div>
 
     <!-- Состояние загрузки -->
@@ -51,8 +51,12 @@
           :name="item.name"
           :image="
             entityType === 'league'
-              ? item.emblem || '/src/assets/free-icon-football-club-919408.png'
-              : item.crest || '/src/assets/free-icon-soccer-player-919397.png'
+              ? item.emblem ||
+                placeholderImage ||
+                '/src/assets/free-icon-football-club-919408.png'
+              : item.crest ||
+                placeholderImage ||
+                '/src/assets/free-icon-soccer-player-919397.png'
           "
           :subtitle="
             entityType === 'league'
@@ -80,7 +84,7 @@
 <script>
 import api from "@/api";
 import Pagination from "@/components/Pagination.vue";
-import Card from "@/components/Card.vue";
+import Card from "@/components/ListOfTitlesCard.vue";
 
 export default {
   name: "MatchesList",
@@ -95,6 +99,18 @@ export default {
       validator: (value) => ["league", "team"].includes(value),
     },
     searchQuery: {
+      type: String,
+      default: "",
+    },
+    pageTitle: {
+      type: String,
+      default: "",
+    },
+    pageSubtitle: {
+      type: String,
+      default: "",
+    },
+    placeholderImage: {
       type: String,
       default: "",
     },
@@ -399,6 +415,10 @@ export default {
   }
 
   .desktop-pagination {
+    display: none !important;
+  }
+
+  .mobile-hide {
     display: none !important;
   }
 }

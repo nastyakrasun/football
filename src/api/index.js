@@ -5,7 +5,7 @@ const api = axios.create({
   //baseURL: "https://api.football-data.org",
   headers: {
     "Content-Type": "application/json",
-    "X-Auth-Token": " 8f32d253d64f4926979a07c8ac040ead",
+    "X-Auth-Token": " d2b968804c0e4852a533383276290aef", //8f32d253d64f4926979a07c8ac040ead
     //"X-Auth-Token": process.env.VUE_APP_FOOTBALL_API_KEY,
   },
 });

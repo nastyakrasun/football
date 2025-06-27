@@ -8,27 +8,19 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-<<<<<<< Updated upstream
-    Card: typeof import('./src/components/Card.vue')['default']
+    Card: typeof import('./src/components/ListOfTitlesCard.vue')['default']
+    DataByTitle: typeof import('./src/components/DataByTitle.vue')['default']
     DatePicker: typeof import('./src/components/DatePicker.vue')['default']
+    HeaderFilters: typeof import('./src/components/HeaderFilters.vue')['default']
     LanguageChange: typeof import('./src/components/LanguageChange.vue')['default']
-    LeaguesTable: typeof import('./src/components/LeaguesTable.vue')['default']
+    ListOfTitles: typeof import('./src/components/ListOfTitles.vue')['default']
+    ListOfTitlesCard: typeof import('./src/components/ListOfTitlesCard.vue')['default']
     MatchCard: typeof import('./src/components/MatchCard.vue')['default']
-=======
-    AppFooter: typeof import('./src/components/AppFooter.vue')['default']
-    AppHeader: typeof import('./src/components/AppHeader.vue')['default']
-    DatePicker: typeof import('./src/components/DatePicker.vue')['default']
->>>>>>> Stashed changes
-    MatchesList: typeof import('./src/components/MatchesList.vue')['default']
     MatchStatusSwitch: typeof import('./src/components/MatchStatusSwitch.vue')['default']
     Pagination: typeof import('./src/components/Pagination.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-<<<<<<< Updated upstream
-    TeamCard: typeof import('./src/components/TeamCard.vue')['default']
     TeamsTable: typeof import('./src/components/TeamsTable.vue')['default']
     ThemeChange: typeof import('./src/components/ThemeChange.vue')['default']
-=======
->>>>>>> Stashed changes
   }
 }

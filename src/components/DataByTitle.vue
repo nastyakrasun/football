@@ -15,32 +15,24 @@
     />
 
     <!-- Состояние ошибки -->
-    <v-alert
-      v-else-if="error"
-      type="error"
-      class="ma-4"
-    >
+    <v-alert v-else-if="error" type="error" class="ma-4">
       {{ error }}
     </v-alert>
 
     <!-- Состояние нет результатов -->
-    <v-alert
-      v-else-if="matches.length === 0"
-      type="info"
-      class="ma-4"
-    >
-      {{ searchQuery ? $t('app.no_matches_found') : $t('app.no_matches_available') }}
+    <v-alert v-else-if="matches.length === 0" type="info" class="ma-4">
+      {{
+        searchQuery
+          ? $t("app.no_matches_found")
+          : $t("app.no_matches_available")
+      }}
     </v-alert>
 
     <!-- Таблица матчей -->
     <template v-else>
       <!-- No matches for selected date (both desktop and mobile) -->
-      <v-alert
-        v-if="filteredMatches.length === 0"
-        type="info"
-        class="ma-4"
-      >
-        {{$t('app.no_matches_selected_date')}}
+      <v-alert v-if="filteredMatches.length === 0" type="info" class="ma-4">
+        {{ $t("app.no_matches_selected_date") }}
       </v-alert>
 
       <!-- Desktop Table View -->
@@ -54,7 +46,11 @@
         >
           <template #headers="{ columns }">
             <tr>
-              <th v-for="column in columns" :key="column.key" :style="{ backgroundColor: thBg, color: thColor }">
+              <th
+                v-for="column in columns"
+                :key="column.key"
+                :style="{ backgroundColor: thBg, color: thColor }"
+              >
                 {{ column.title }}
               </th>
             </tr>
@@ -62,40 +58,39 @@
 
           <template #item="{ item, columns }">
             <tr>
-              <td v-for="column in columns" :key="column.key" :style="{ color: thColor }">
-                <span v-if="column.key === 'utcDate'">{{ new Date(item.utcDate).toLocaleString() }}</span>
+              <td
+                v-for="column in columns"
+                :key="column.key"
+                :style="{ color: thColor }"
+              >
+                <span v-if="column.key === 'utcDate'">{{
+                  new Date(item.utcDate).toLocaleString()
+                }}</span>
                 <span v-else-if="column.key === 'status'">
-            <v-chip :color="getStatusColor(item.status)" small>
-              {{ getStatusText(item.status) }}
-            </v-chip>
+                  <v-chip :color="getStatusColor(item.status)" small>
+                    {{ getStatusText(item.status) }}
+                  </v-chip>
                 </span>
                 <span v-else-if="column.key === 'hometeam'">
-            <b>{{ item.homeTeam?.name }}</b>
+                  <b>{{ item.homeTeam?.name }}</b>
                 </span>
                 <span v-else-if="column.key === 'awayteam'">
-            {{ item.awayTeam?.name }}
+                  {{ item.awayTeam?.name }}
                 </span>
                 <span v-else-if="column.key === 'score'">
-            {{ getScoreText(item) }}
+                  {{ getScoreText(item) }}
                 </span>
               </td>
             </tr>
           </template>
         </v-data-table>
-        <div class="desktop-pagination">
-          <Pagination
-            v-if="totalPages > 1"
-            :total-pages="totalPages"
-            :current-page="page"
-            @update:currentPage="page = $event"
-          />
-        </div>
       </div>
 
       <!-- Mobile Card View -->
       <div class="mobile-view" v-if="filteredMatches.length > 0">
         <div class="matches-cards">
           <MatchCard
+            type="match"
             v-for="match in filteredMatches"
             :key="match.id"
             :competitionName="match.competition?.name || entity.name || '-'"
@@ -117,36 +112,35 @@
 </template>
 
 <script>
-import api from '@/api'
-import { useTheme } from 'vuetify'
-import { computed } from 'vue'
-import MatchCard from '@/components/MatchCard.vue'
-import Pagination from '@/components/Pagination.vue'
+import api from "@/api";
+import { useTheme } from "vuetify";
+import { computed } from "vue";
+import MatchCard from "@/components/MatchCard.vue";
 
 export default {
-  name: 'LeaguesTable',
+  name: "LeaguesTable",
   props: {
     entityType: {
       type: String,
       required: true,
-      validator: value => ['league', 'team'].includes(value)
+      validator: (value) => ["league", "team"].includes(value),
     },
     entityId: {
       type: [String, Number],
-      required: true
+      required: true,
     },
     searchQuery: {
       type: String,
-      default: ''
+      default: "",
     },
     selectedDate: {
       type: [String, Date],
-      default: null
+      default: null,
     },
     selectedStatus: {
       type: String,
-      default: 'all'
-    }
+      default: "all",
+    },
   },
   data() {
     return {
@@ -156,55 +150,61 @@ export default {
       error: null,
       page: 1,
       itemsPerPage: 10,
-    }
+    };
   },
   setup() {
-    const theme = useTheme()
-    const thBg = computed(() => theme.global.name.value === 'dark' ? '#2c3e50' : '#f8f9fa')
-    const thColor = computed(() => theme.global.name.value === 'dark' ? '#f8f9fa' : '#2c3e50')
-    return { thBg, thColor }
+    const theme = useTheme();
+    const thBg = computed(() =>
+      theme.global.name.value === "dark" ? "#2c3e50" : "#f8f9fa"
+    );
+    const thColor = computed(() =>
+      theme.global.name.value === "dark" ? "#f8f9fa" : "#2c3e50"
+    );
+    return { thBg, thColor };
   },
   computed: {
     filteredMatches() {
       let filtered = this.matches;
       // Фильтрация по дате
       if (this.selectedDate) {
-      let selectedDate;
+        let selectedDate;
         if (this.selectedDate instanceof Date) {
           selectedDate = this.selectedDate;
-        } else if (typeof this.selectedDate === 'string') {
-          selectedDate = new Date(this.selectedDate + 'T00:00:00');
+        } else if (typeof this.selectedDate === "string") {
+          selectedDate = new Date(this.selectedDate + "T00:00:00");
         }
         if (selectedDate) {
-      selectedDate.setHours(0, 0, 0, 0);
-          filtered = filtered.filter(match => {
-        const matchDate = new Date(match.utcDate);
-        matchDate.setHours(0, 0, 0, 0);
-        return matchDate.getTime() === selectedDate.getTime();
-      });
+          selectedDate.setHours(0, 0, 0, 0);
+          filtered = filtered.filter((match) => {
+            const matchDate = new Date(match.utcDate);
+            matchDate.setHours(0, 0, 0, 0);
+            return matchDate.getTime() === selectedDate.getTime();
+          });
         }
       }
       // Фильтрация по статусу
-      if (this.selectedStatus && this.selectedStatus !== 'all') {
-        filtered = filtered.filter(match => match.status === this.selectedStatus);
+      if (this.selectedStatus && this.selectedStatus !== "all") {
+        filtered = filtered.filter(
+          (match) => match.status === this.selectedStatus
+        );
       }
       return filtered;
     },
     totalPages() {
-      return Math.ceil(this.matches.length / this.itemsPerPage)
+      return Math.ceil(this.matches.length / this.itemsPerPage);
     },
     paginatedMatches() {
-      const start = (this.page - 1) * this.itemsPerPage
-      const end = start + this.itemsPerPage
-      return this.matches.slice(start, end)
+      const start = (this.page - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.matches.slice(start, end);
     },
     headers() {
       return [
-        { key: 'utcDate', title: this.$t('app.table_date') },
-        { key: 'status', title: this.$t('app.table_status') },
-        { key: 'hometeam', title: this.$t('app.table_home') },
-        { key: 'awayteam', title: this.$t('app.table_away') },
-        { key: 'score', title: this.$t('app.table_score') },
+        { key: "utcDate", title: this.$t("app.table_date") },
+        { key: "status", title: this.$t("app.table_status") },
+        { key: "hometeam", title: this.$t("app.table_home") },
+        { key: "awayteam", title: this.$t("app.table_away") },
+        { key: "score", title: this.$t("app.table_score") },
       ];
     },
     isMobile() {
@@ -213,103 +213,117 @@ export default {
     tableFooterProps() {
       return this.isMobile
         ? { itemsPerPageOptions: [] } // Hide footer on mobile
-        : { 'items-per-page-text': this.$t('app.items_per_page') };
-    }
+        : { "items-per-page-text": this.$t("app.items_per_page") };
+    },
   },
   methods: {
     async fetchData() {
-      this.isLoading = true
-      this.error = null
+      this.isLoading = true;
+      this.error = null;
       try {
-        // Only fetch league data
-        const [entityResponse, matchesResponse] = await Promise.all([
-          api.get(`api/v4/competitions/${this.entityId}`),
-          api.get(`api/v4/competitions/${this.entityId}/matches`)
-        ])
-        this.entity = entityResponse.data
-        this.matches = matchesResponse.data.matches
+        let entityResponse, matchesResponse;
+        if (this.entityType === "league") {
+          [entityResponse, matchesResponse] = await Promise.all([
+            api.get(`api/v4/competitions/${this.entityId}`),
+            api.get(`api/v4/competitions/${this.entityId}/matches`),
+          ]);
+          this.entity = entityResponse.data;
+          this.matches = matchesResponse.data.matches;
+        } else if (this.entityType === "team") {
+          [entityResponse, matchesResponse] = await Promise.all([
+            api.get(`api/v4/teams/${this.entityId}`),
+            api.get(`api/v4/teams/${this.entityId}/matches`),
+          ]);
+          this.entity = entityResponse.data;
+          this.matches = matchesResponse.data.matches;
+        }
       } catch (err) {
-        this.error = `Не удалось загрузить данные лиги. Пожалуйста, попробуйте позже.`
-        console.error(`league data error:`, err)
+        this.error = `Не удалось загрузить данные лиги. Пожалуйста, попробуйте позже.`;
+        console.error(`league data error:`, err);
       } finally {
-        this.isLoading = false
+        this.isLoading = false;
       }
     },
     getStatusText(status) {
       const statusMap = {
-        SCHEDULED: this.$t('app.status_scheduled'),
-        LIVE: this.$t('app.status_live'),
-        IN_PLAY: this.$t('app.status_in_play'),
-        PAUSED: this.$t('app.status_paused'),
-        FINISHED: this.$t('app.status_finished'),
-        POSTPONED: this.$t('app.status_postponed'),
-        SUSPENDED: this.$t('app.status_suspended'),
-        CANCELLED: this.$t('app.status_cancelled'),
-        TIMED: this.$t('app.status_timed'),
-        ABANDONED: this.$t('app.status_abandoned'),
-        TECHNICAL_LOSS: this.$t('app.status_technical_loss'),
-      }
-      return statusMap[status] || status
+        SCHEDULED: this.$t("app.status_scheduled"),
+        LIVE: this.$t("app.status_live"),
+        IN_PLAY: this.$t("app.status_in_play"),
+        PAUSED: this.$t("app.status_paused"),
+        FINISHED: this.$t("app.status_finished"),
+        POSTPONED: this.$t("app.status_postponed"),
+        SUSPENDED: this.$t("app.status_suspended"),
+        CANCELLED: this.$t("app.status_cancelled"),
+        TIMED: this.$t("app.status_timed"),
+        ABANDONED: this.$t("app.status_abandoned"),
+        TECHNICAL_LOSS: this.$t("app.status_technical_loss"),
+      };
+      return statusMap[status] || status;
     },
     getStatusColor(status) {
-      const statusMap = {        
-        SCHEDULED: 'primary',
-        LIVE: 'error',
-        IN_PLAY: 'error',
-        PAUSED: 'warning',
-        FINISHED: 'success',
-        POSTPONED: 'warning',        
-        SUSPENDED: 'info',
-        CANCELLED: 'warning',        
-        TIMED: 'primary',        
-        ABANDONED: 'error',
-        TECHNICAL_LOSS: 'error'
-      }
-      return statusMap[status] || 'grey'
+      const statusMap = {
+        SCHEDULED: "primary",
+        LIVE: "error",
+        IN_PLAY: "error",
+        PAUSED: "warning",
+        FINISHED: "success",
+        POSTPONED: "warning",
+        SUSPENDED: "info",
+        CANCELLED: "warning",
+        TIMED: "primary",
+        ABANDONED: "error",
+        TECHNICAL_LOSS: "error",
+      };
+      return statusMap[status] || "grey";
     },
     getScoreText(item) {
-      return item.score.fullTime.home !== null && item.score.fullTime.away !== null
+      return item.score.fullTime.home !== null &&
+        item.score.fullTime.away !== null
         ? `${item.score.fullTime.home} - ${item.score.fullTime.away}`
-        : '-'
+        : "-";
     },
     getHomeScore(match) {
-      return match.score.fullTime.home !== null ? match.score.fullTime.home : '-'
+      return match.score.fullTime.home !== null
+        ? match.score.fullTime.home
+        : "-";
     },
     getAwayScore(match) {
-      return match.score.fullTime.away !== null ? match.score.fullTime.away : '-'
+      return match.score.fullTime.away !== null
+        ? match.score.fullTime.away
+        : "-";
     },
-    formatMatchDate(dateString) { // форматирование даты с русской локализацией и учетом часового пояса
-      const date = new Date(dateString)
-      return date.toLocaleDateString('ru-RU', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      })
+    formatMatchDate(dateString) {
+      // форматирование даты с русской локализацией и учетом часового пояса
+      const date = new Date(dateString);
+      return date.toLocaleDateString("ru-RU", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
     },
     formatMatchTime(dateString) {
-      const date = new Date(dateString)
-      return date.toLocaleTimeString('ru-RU', {
-        hour: '2-digit',
-        minute: '2-digit'
-      })
+      const date = new Date(dateString);
+      return date.toLocaleTimeString("ru-RU", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     },
     onSearchInput() {
-      this.page = 1
-    }
+      this.page = 1;
+    },
   },
   mounted() {
-    this.fetchData()
+    this.fetchData();
   },
   watch: {
     entityId() {
-      this.fetchData()
-    }
+      this.fetchData();
+    },
   },
   components: {
     MatchCard,
-    Pagination
   },
-}
+};
 </script>
 
 <style scoped>
@@ -327,7 +341,7 @@ export default {
 }
 
 .page-header::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -1rem;
   left: 50%;
@@ -526,10 +540,6 @@ export default {
   .vs-divider {
     padding: 0 0.75rem;
   }
-
-  .desktop-pagination {
-    display: none !important;
-  }
 }
 
 @media (max-width: 480px) {
@@ -593,4 +603,4 @@ export default {
     gap: 0.2rem;
   }
 }
-</style> 
+</style>

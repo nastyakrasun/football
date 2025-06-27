@@ -1,11 +1,14 @@
 <template>
-  <header class="app-header" :style="{ backgroundColor: headerBg + ' !important' }">
+  <header
+    class="app-header"
+    :style="{ backgroundColor: headerBg + ' !important' }"
+  >
     <div class="header-content">
       <!-- Логотип и бренд -->
       <div class="brand-section">
         <!-- <img src="../assets/free-icon-app-919423.png" alt="Logo" class="logo" /> -->
-        <img src="../assets/logo.png" alt="Logo" class="logo" /> 
-        <h1 class="brand-name">{{$t('app.title')}}</h1>
+        <img src="../assets/logo.png" alt="Logo" class="logo" />
+        <h1 class="brand-name mobile-hide">{{ $t("app.title") }}</h1>
       </div>
       <!-- Основная навигация -->
       <nav class="main-nav">
@@ -14,27 +17,27 @@
           :class="{ active: $route.path === '/' }"
           variant="text"
         >
-          {{$t('app.home')}}
+          {{ $t("app.home") }}
         </v-btn>
         <v-btn
           @click="$router.push('/leagues')"
           :class="{ active: $route.path === '/leagues' }"
           variant="text"
         >
-          {{$t('app.leagues')}}
+          {{ $t("app.leagues") }}
         </v-btn>
         <v-btn
           @click="$router.push('/teams')"
           :class="{ active: $route.path === '/teams' }"
           variant="text"
         >
-          {{$t('app.teams')}}
+          {{ $t("app.teams") }}
         </v-btn>
       </nav>
       <!-- Правая секция -->
-      <div class="header-right">
+      <div class="header-right mobile-hide">
         <v-text-field
-          v-model="searchQuery" 
+          v-model="searchQuery"
           :placeholder="$t('app.search')"
           prepend-inner-icon="mdi-magnify"
           clearable
@@ -50,7 +53,7 @@
     </div>
     <!-- Вторая строка с календарем и фильтрами статуса -->
     <div class="header-second-row">
-      <DatePicker 
+      <DatePicker
         :model-value="selectedDate"
         @update:model-value="$emit('update:selectedDate', $event)"
         @date-change="onDateChange"
@@ -65,9 +68,9 @@
           :class="{ 'status-btn-active': selectedStatus === status.value }"
           @click="setStatus(status.value)"
         >
-          <v-icon 
-            :icon="status.icon" 
-            size="16" 
+          <v-icon
+            :icon="status.icon"
+            size="16"
             class="status-icon"
             :class="{ 'status-icon-active': selectedStatus === status.value }"
           ></v-icon>
@@ -79,61 +82,76 @@
 </template>
 
 <script>
-import ThemeChange from '../components/ThemeChange.vue'
-import LanguageChange from '../components/LanguageChange.vue'
-import DatePicker from '../components/DatePicker.vue'
-import { useTheme } from 'vuetify'
-import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import ThemeChange from "../components/ThemeChange.vue";
+import LanguageChange from "../components/LanguageChange.vue";
+import DatePicker from "../components/DatePicker.vue";
+import { useTheme } from "vuetify";
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 export default {
-  name: 'AppHeader',
+  name: "AppHeader",
   components: { ThemeChange, LanguageChange, DatePicker },
   props: {
     selectedDate: {
       type: [String, Date],
-      default: null
+      default: null,
     },
     selectedStatus: {
       type: String,
-      default: 'all'
-    }
+      default: "all",
+    },
   },
-  emits: ['search', 'date-change', 'update:selectedDate', 'update:selectedStatus'],
+  emits: [
+    "search",
+    "date-change",
+    "update:selectedDate",
+    "update:selectedStatus",
+  ],
   setup() {
-    const theme = useTheme()
-    const headerBg = computed(() => theme.global.name.value === 'dark' ? '#2c3e50' : 'white')
-    const { t } = useI18n()
+    const theme = useTheme();
+    const headerBg = computed(() =>
+      theme.global.name.value === "dark" ? "#2c3e50" : "white"
+    );
+    const { t } = useI18n();
     const statusOptions = computed(() => [
-      { value: 'all', label: t('app.status_all'), icon: 'mdi-view-list' },
-      { value: 'LIVE', label: t('app.status_live'), icon: 'mdi-play-circle' },
-      { value: 'SCHEDULED', label: t('app.status_scheduled'), icon: 'mdi-clock-outline' },
-      { value: 'FINISHED', label: t('app.status_finished'), icon: 'mdi-check-circle' },
-    ])
-    return { headerBg, statusOptions }
+      { value: "all", label: t("app.status_all"), icon: "mdi-view-list" },
+      { value: "LIVE", label: t("app.status_live"), icon: "mdi-play-circle" },
+      {
+        value: "SCHEDULED",
+        label: t("app.status_scheduled"),
+        icon: "mdi-clock-outline",
+      },
+      {
+        value: "FINISHED",
+        label: t("app.status_finished"),
+        icon: "mdi-check-circle",
+      },
+    ]);
+    return { headerBg, statusOptions };
   },
   data() {
     return {
-      searchQuery: ""
+      searchQuery: "",
     };
   },
   methods: {
     onSearch() {
-      this.$emit('search', this.searchQuery);
+      this.$emit("search", this.searchQuery);
     },
     onDateChange() {
-      this.$emit('date-change');
+      this.$emit("date-change");
     },
     setStatus(status) {
-      this.$emit('update:selectedStatus', status);
-    }
-  }
+      this.$emit("update:selectedStatus", status);
+    },
+  },
 };
 </script>
 
 <style scoped>
 .app-header {
-  background-color: #2c3e50;
+  background-color: white;
   box-shadow: 0 2px 12px rgba(44, 62, 80, 0.1);
   position: sticky;
   top: 0;
@@ -209,7 +227,8 @@ export default {
 }
 
 .main-nav .v-btn.active {
-  color: #23609a;
+  color: white;
+  background: linear-gradient(135deg, #3498db, #2980b9) !important;
   font-weight: 700;
 }
 
@@ -302,7 +321,7 @@ export default {
   .status-btn {
     border-color: rgba(200, 220, 255, 0.15);
   }
-  
+
   .status-btn:hover {
     border-color: rgba(52, 152, 219, 0.4);
   }
@@ -310,11 +329,25 @@ export default {
 
 @media (max-width: 768px) {
   .header-content {
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.5rem 0.5rem 0.5rem;
   }
-
+  .brand-section {
+    gap: 0.5rem;
+  }
+  .brand-name {
+    display: none;
+  }
+  .main-nav {
+    flex-direction: row;
+    gap: 0.5rem;
+    margin-left: 0.5rem;
+  }
+  .logo {
+    height: 32px;
+  }
   .header-second-row {
     flex-direction: row;
     align-items: center;
@@ -363,9 +396,14 @@ export default {
   .status-icon {
     font-size: 18px;
   }
+
+  .mobile-hide {
+    display: none !important;
+  }
 }
 
-html, body {
+html,
+body {
   background: var(--v-theme-background, #f8f9fa) !important;
 }
-</style> 
+</style>

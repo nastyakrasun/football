@@ -1,23 +1,26 @@
 <template>
-  <MatchesList 
+  <MatchesList
     entity-type="league"
     :search-query="searchQuery"
+    page-title="Лиги"
+    page-subtitle="Все футбольные лиги"
+    placeholder-image="/src/assets/free-icon-football-club-919408.png"
   />
 </template>
 
 <script>
-import MatchesList from '@/components/MatchesList.vue'
+import MatchesList from "@/components/ListOfTitles.vue";
 
 export default {
-  name: 'LeaguesPage',
+  name: "LeaguesPage",
   components: {
-    MatchesList
+    MatchesList,
   },
   props: {
     searchQuery: {
       type: String,
-      default: ''
-    }
-  }
-}
-</script> 
+      default: "",
+    },
+  },
+};
+</script>

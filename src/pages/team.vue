@@ -1,5 +1,6 @@
 <template>
-  <TeamsTable 
+  <MatchesTable
+    entity-type="team"
     :entity-id="$route.params.id"
     :search-query="searchQuery"
     :selected-date="selectedDate"
@@ -8,26 +9,26 @@
 </template>
 
 <script>
-import TeamsTable from '@/components/TeamsTable.vue'
+import MatchesTable from "@/components/DataByTitle.vue";
 
 export default {
-  name: 'TeamPage',
+  name: "TeamPage",
   components: {
-    TeamsTable
+    MatchesTable,
   },
   props: {
     searchQuery: {
       type: String,
-      default: ''
+      default: "",
     },
     selectedDate: {
       type: [String, Date],
-      default: null
+      default: null,
     },
     selectedStatus: {
       type: String,
-      default: 'all'
-    }
-  }
-}
-</script> 
+      default: "all",
+    },
+  },
+};
+</script>
