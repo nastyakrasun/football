@@ -1,8 +1,5 @@
 <template>
-  <header
-    class="app-header"
-    :style="{ backgroundColor: headerBg + ' !important' }"
-  >
+  <header class="app-header" :style="{ backgroundColor: headerBg }">
     <div class="header-content">
       <!-- Логотип и бренд -->
       <div class="brand-section">
@@ -151,7 +148,7 @@ export default {
 
 <style scoped>
 .app-header {
-  background-color: white;
+ /* background-color: white;*/
   box-shadow: 0 2px 12px rgba(44, 62, 80, 0.1);
   position: sticky;
   top: 0;

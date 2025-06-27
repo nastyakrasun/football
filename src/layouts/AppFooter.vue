@@ -3,7 +3,7 @@
     <!-- Desktop Footer -->
     <div
       class="app-footer desktop-footer"
-      :style="{ backgroundColor: headerBg + ' !important' }"
+      :style="{ backgroundColor: footerBg }"
     >
       <v-container>
         <div class="footer-content">
@@ -90,7 +90,7 @@
     <!-- Mobile Footer -->
     <div
       class="app-footer mobile-footer"
-      :style="{ backgroundColor: footerBg + ' !important' }"
+      :style="{ backgroundColor: headerBg }"
     >
       <div class="footer-middle-row">
         <v-text-field
@@ -146,14 +146,93 @@ export default {
 
 <style scoped>
 .app-footer.desktop-footer {
-  background-color: #2c3e50;
-  color: white;
+  background-color: #2c3e50 !important;
   padding: 3rem 0 1.5rem;
   margin-top: 2rem;
   display: block;
 }
 .app-footer.mobile-footer {
   display: none;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.footer-section h3 {
+  color: #3498db;
+  margin-bottom: 1.25rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.footer-section p {
+  color: #ecf0f1;
+  line-height: 1.7;
+  opacity: 0.9;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  margin-bottom: 0.75rem;
+}
+
+.footer-links a {
+  color: #ecf0f1;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  opacity: 0.9;
+  font-size: 1.05rem;
+  display: inline-block;
+}
+
+.footer-links a:hover {
+  color: #3498db;
+  opacity: 1;
+  transform: translateX(5px);
+}
+
+.social-links {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.social-links .v-btn {
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.social-links .v-btn:hover {
+  background-color: #3498db;
+  transform: translateY(-3px);
+}
+
+.social-links .v-icon {
+  color: white;
+}
+
+.social-links svg {
+  color: white;
+  fill: currentColor;
+}
+
+.footer-bottom {
+  text-align: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ecf0f1;
+  opacity: 0.8;
+  font-size: 0.95rem;
 }
 .footer-middle-row {
   display: flex;
@@ -173,7 +252,6 @@ export default {
   }
   .app-footer.mobile-footer {
     display: block;
-    /*background-color: white;*/
     border-top: 1px solid rgba(44, 62, 80, 0.1);
     box-shadow: 0 -2px 12px rgba(44, 62, 80, 0.08);
     padding: 0.5rem 1rem 1rem 1rem;
@@ -182,7 +260,6 @@ export default {
     right: 0;
     bottom: 0;
     z-index: 1000;
-    background-color: white;
     opacity: 1;
     transition: background-color 0.3s;
   }
