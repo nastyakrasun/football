@@ -272,6 +272,7 @@ export default {
   background-color: var(--v-theme-surface);
 }
 
+
 @media (prefers-color-scheme: dark) {
   .league-card {
     border: 2px solid rgba(200, 220, 255, 0.22);

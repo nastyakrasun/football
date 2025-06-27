@@ -18,14 +18,16 @@
         </v-btn>
         <v-btn
           @click="$router.push('/leagues')"
-          :class="{ active: $route.path === '/leagues' }"
+          :class="{
+            active: $route.name === 'leagues' || $route.name === 'league',
+          }"
           variant="text"
         >
           {{ $t("app.leagues") }}
         </v-btn>
         <v-btn
           @click="$router.push('/teams')"
-          :class="{ active: $route.path === '/teams' }"
+          :class="{ active: $route.name === 'teams' || $route.name === 'team' }"
           variant="text"
         >
           {{ $t("app.teams") }}
@@ -148,7 +150,7 @@ export default {
 
 <style scoped>
 .app-header {
- /* background-color: white;*/
+  /* background-color: white;*/
   box-shadow: 0 2px 12px rgba(44, 62, 80, 0.1);
   position: sticky;
   top: 0;
@@ -344,7 +346,7 @@ export default {
   }
   .logo {
     height: 32px;
-    margin-left: 0.5rem
+    margin-left: 0.5rem;
   }
   .header-second-row {
     flex-direction: row;

@@ -50,7 +50,7 @@ const messages = {
       not_specified: "Not specified",
       no_matches_found: "No matches found",
       no_matches_available: "No matches available",
-      no_matches_selected_date: "No matches for the selected date",
+      no_matches_selected_date: "No matches for the selected filters",
       table_date: "Date",
       table_status: "Status",
       table_home: "Home",
@@ -82,6 +82,7 @@ const messages = {
       language_ru: "Russian",
       language_en: "English",
       theme_light: "Light",
+      failed_to_load_data: "Failed to load data. Please try again later",
     },
   },
   ru: {
@@ -124,7 +125,7 @@ const messages = {
       not_specified: "Не указано",
       no_matches_found: "Матчей не найдено",
       no_matches_available: "Нет доступных матчей",
-      no_matches_selected_date: "Нет матчей на выбранную дату",
+      no_matches_selected_date: "Нет матчей по выбранным фильтрам",
       table_date: "Дата",
       table_status: "Статус",
       table_home: "Хозяева",
@@ -152,6 +153,7 @@ const messages = {
       calendar: "Календарь",
       dateSelection: "Выбор даты",
       selectedDate: "Выбранная дата",
+      failed_to_load_data: "Не удалось загрузить данные. Пожалуйста, попробуйте позже",
     },
   },
 };

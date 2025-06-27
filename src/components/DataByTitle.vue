@@ -1,7 +1,7 @@
 <template>
   <div class="matches-table">
     <!-- Название страницы -->
-    <div class="page-header">
+    <div class="page-header mobile-hide">
       <h1>{{ entity.name }}</h1>
       <p class="subtitle">{{ entity.area?.name }}</p>
     </div>
@@ -238,7 +238,7 @@ export default {
           this.matches = matchesResponse.data.matches;
         }
       } catch (err) {
-        this.error = `Не удалось загрузить данные лиги. Пожалуйста, попробуйте позже.`;
+        this.error = this.$t("app.failed_to_load_data");
         console.error(`league data error:`, err);
       } finally {
         this.isLoading = false;
@@ -539,6 +539,10 @@ export default {
 
   .vs-divider {
     padding: 0 0.75rem;
+  }
+
+  .mobile-hide {
+    display: none !important;
   }
 }
 
