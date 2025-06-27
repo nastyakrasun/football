@@ -39,8 +39,8 @@
       <div class="desktop-view" v-if="filteredMatches.length > 0">
         <v-data-table
           :headers="headers"
-          :items="paginatedMatches"
-          :items-per-page="itemsPerPage"
+          :items="filteredMatches"
+          :items-per-page="filteredMatches.length"
           class="elevation-1"
           :footer-props="{ itemsPerPageOptions: [] }"
         >
@@ -149,7 +149,7 @@ export default {
       isLoading: true,
       error: null,
       page: 1,
-      itemsPerPage: 10,
+      itemsPerPage: 9999,
     };
   },
   setup() {

@@ -9,22 +9,26 @@
       :selected-status="selectedStatus"
       @update:selected-status="selectedStatus = $event"
     >
-      <router-view :searchQuery="searchQuery" :selectedDate="selectedDate" :selectedStatus="selectedStatus" />
+      <router-view
+        :searchQuery="searchQuery"
+        :selectedDate="selectedDate"
+        :selectedStatus="selectedStatus"
+      />
     </DefaultLayout>
   </v-app>
 </template>
 
 <script>
-import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import DefaultLayout from "@/layouts/DefaultLayout.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: { DefaultLayout },
   data() {
     return {
       searchQuery: "",
       selectedDate: null,
-      selectedStatus: 'all',
+      selectedStatus: "all",
     };
   },
   methods: {
@@ -34,8 +38,8 @@ export default {
     onDateChange() {
       // Передаем изменение даты в роутер
       this.$forceUpdate();
-    }
-  }
+    },
+  },
 };
 </script>
 
