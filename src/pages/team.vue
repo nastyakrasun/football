@@ -16,7 +16,6 @@ export default {
   components: {
     MatchesTable,
   },
-  inject: ["selectedDate", "selectedStatus", "searchQuery"],
   props: {
     searchQuery: {
       type: String,
